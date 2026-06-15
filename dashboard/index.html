@@ -1115,7 +1115,7 @@ function runStep(i) {
       let desiredScroll;
 
       if (i === tourSteps.length - 1) {
-        desiredScroll = m.scrollHeight - m.clientHeight;
+        desiredScroll = m.scrollHeight;
       } else {
         const target       = document.getElementById(tourSteps[i].target);
         const mainRect     = m.getBoundingClientRect();
