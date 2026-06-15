@@ -1022,16 +1022,16 @@ function goToStep(i) {
   const m      = mainEl();
   const target = document.getElementById(tourSteps[i].target);
 
-  // Calculate exactly how far .main needs to scroll so the target element
-  // sits 40px from the top of the visible scroll area — giving the user
-  // clear breathing room above the highlight.
-  const targetScrollTop = m.scrollTop + target.getBoundingClientRect().top - m.getBoundingClientRect().top - 40;
+  // offsetTop is the element's absolute distance from the top of .main —
+  // it never changes based on scroll position, so this is always accurate.
+  // We subtract 40px to give breathing room above the highlighted area.
+  const targetScrollTop = target.offsetTop - 40;
 
-  // Smooth scroll to that precise position
+  // Smooth scroll .main to that exact position
   m.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
 
-  // Wait for the smooth scroll to finish, then read the final coordinates
-  // and place the highlight + tooltip exactly where the element landed.
+  // Wait for the smooth scroll to fully land, then read where the element
+  // actually is on screen and place the highlight + tooltip there.
   setTimeout(() => {
     placeElements(i);
   }, SCROLL_DURATION);
