@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISG Financial · Manager Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root {
+  --navy-900: #02040a;
+  --navy-800: #050810;
+  --navy-750: #07101e;
+  --navy-700: #0a1526;
+  --navy-600: #0e1d36;
+  --navy-550: #122440;
+  --navy-500: #182d50;
+  --navy-400: #1f3a66;
+  --navy-300: #2b4e88;
+
+  --gold:      #f0b840;
+  --gold-hi:   #ffd060;
+  --gold-lo:   #cc8e1a;
+  --gold-dim:  rgba(240,184,64,0.14);
+  --gold-mid:  rgba(240,184,64,0.28);
+  --gold-glow: rgba(240,184,64,0.10);
+
+  --text-1: #f8faff;
+  --text-2: #ccd8f0;
+  --text-3: #8ea4c8;
+  --text-4: #5a72a0;
+
+  --red:      #ff3333;
+  --red-hi:   #ff5555;
+  --red-dim:  rgba(255,51,51,0.12);
+  --red-mid:  rgba(255,51,51,0.25);
+
+  --green:     #1ed688;
+  --green-hi:  #44f0a0;
+  --green-dim: rgba(30,214,136,0.12);
+
+  --amber:     #f0a020;
+  --amber-dim: rgba(240,160,32,0.14);
+
+  --border:   rgba(255,255,255,0.07);
+  --border-2: rgba(255,255,255,0.12);
+  --border-g: rgba(240,184,64,0.28);
+
+  --sp-xs: 13px;
+  --sp-sm: 21px;
+  --sp-md: 34px;
+  --kpi-h: 144px;
+  --r-card: 16px;
+  --r-chip: 10px;
+  --r-pill: 6px;
+  --r-tag:  5px;
+}
+
+body {
+  font-family:'Inter',sans-serif;
+  background:
+    radial-gradient(ellipse 80% 50% at 65% -10%, rgba(30,58,140,0.45) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 5% 90%, rgba(240,184,64,0.06) 0%, transparent 55%),
+    var(--navy-800);
+  color:var(--text-1);
+  min-height:100vh;
+  display:flex; flex-direction:column;
+}
+
+/* ── NAV ── */
+.topnav {
+  height:72px;
+  background:linear-gradient(90deg,var(--navy-700) 0%,var(--navy-600) 50%,var(--navy-550) 100%);
+  border-bottom:1px solid var(--border-2);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 var(--sp-md); flex-shrink:0; position:sticky; top:0; z-index:50;
+  box-shadow:0 1px 0 rgba(240,184,64,0.18),0 8px 40px rgba(0,0,0,0.60);
+}
+.nav-brand { display:flex; align-items:center; gap:16px; }
+.nav-logo  { font-size:26px; font-weight:900; letter-spacing:-1px; color:var(--text-1); }
+.nav-logo span { color:var(--gold); }
+.nav-pipe  { width:1px; height:22px; background:var(--border-2); }
+.nav-label { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:var(--text-3); }
+.nav-right { display:flex; align-items:center; gap:var(--sp-xs); }
+.nav-date  { font-size:13px; color:var(--text-3); font-weight:500; margin-right:8px; }
+.nav-icon-btn {
+  width:36px; height:36px; background:var(--navy-500); border:1px solid var(--border-2);
+  border-radius:var(--r-chip); display:flex; align-items:center; justify-content:center;
+  position:relative; cursor:pointer; transition:all 0.15s;
+}
+.nav-icon-btn:hover { background:var(--navy-400); border-color:var(--border-g); }
+.nav-icon-btn svg { width:16px; height:16px; stroke:var(--text-2); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.notif-dot { position:absolute; top:7px; right:7px; width:7px; height:7px; background:var(--red); border-radius:50%; border:1.5px solid var(--navy-700); }
+.nav-avatar {
+  width:36px; height:36px;
+  background:linear-gradient(135deg,var(--navy-500),var(--navy-400));
+  border:1.5px solid var(--border-g); border-radius:var(--r-chip);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:800; color:var(--gold-hi); cursor:pointer;
+  box-shadow:0 0 0 3px var(--gold-glow);
+}
+
+/* Tour button in nav */
+.tour-btn {
+  display:flex; align-items:center; gap:7px;
+  background:var(--gold-dim); border:1px solid var(--border-g);
+  border-radius:var(--r-chip); padding:8px 14px;
+  font-size:12px; font-weight:700; color:var(--gold-hi);
+  font-family:'Inter',sans-serif; cursor:pointer; transition:all 0.15s;
+}
+.tour-btn:hover { background:var(--gold-mid); }
+.tour-btn svg { width:14px; height:14px; stroke:var(--gold-hi); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+/* ── LAYOUT ── */
+.layout { display:flex; flex:1; overflow:hidden; height:calc(100vh - 72px); }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width:210px; flex-shrink:0;
+  background:linear-gradient(180deg,var(--navy-700) 0%,var(--navy-800) 100%);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  padding:var(--sp-sm) 10px; overflow-y:auto;
+}
+.sidebar::-webkit-scrollbar { display:none; }
+.sb-section { margin-bottom:var(--sp-sm); }
+.sb-eyebrow { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.16em; color:var(--text-4); padding:0 10px; margin-bottom:7px; }
+.sb-item {
+  display:flex; align-items:center; gap:9px;
+  padding:9px 10px; border-radius:var(--r-chip); cursor:pointer; margin-bottom:2px;
+  font-size:13px; font-weight:500; color:var(--text-2); transition:all 0.15s;
+}
+.sb-item:hover { background:var(--navy-550); color:var(--text-1); }
+.sb-item.active { background:var(--gold-dim); color:var(--gold-hi); font-weight:700; border:1px solid var(--border-g); }
+.sb-item svg { width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+.sb-badge { margin-left:auto; font-size:10px; font-weight:700; padding:2px 7px; border-radius:var(--r-tag); }
+.sb-badge.red  { background:var(--red-dim);  color:var(--red-hi); }
+.sb-badge.gold { background:var(--gold-dim); color:var(--gold-hi); }
+
+/* ── MAIN ── */
+.main { flex:1; overflow-y:auto; }
+.main::-webkit-scrollbar { width:4px; }
+.main::-webkit-scrollbar-thumb { background:var(--navy-400); border-radius:2px; }
+
+/* ── PAGES ── */
+.page { display:none; }
+.page.active { display:block; }
+
+/* ══════════════════════════════
+   DASHBOARD PAGE
+══════════════════════════════ */
+.page-hd {
+  padding:var(--sp-md) var(--sp-md) 0;
+  display:flex; align-items:flex-end; justify-content:space-between;
+  margin-bottom:var(--sp-sm);
+}
+.page-title { font-size:32px; font-weight:900; letter-spacing:-1.2px; color:var(--text-1); line-height:1; }
+.page-sub   { font-size:14px; color:var(--text-3); margin-top:6px; }
+.hd-actions { display:flex; gap:10px; align-items:center; }
+.btn-primary {
+  display:flex; align-items:center; gap:7px;
+  background:linear-gradient(135deg,#ffe080 0%,var(--gold) 40%,var(--gold-lo) 100%);
+  color:var(--navy-900); border:none; border-radius:var(--r-chip);
+  padding:11px var(--sp-sm); font-size:13px; font-weight:700;
+  font-family:'Inter',sans-serif; cursor:pointer;
+  box-shadow:0 4px 20px rgba(240,184,64,0.45),0 1px 0 rgba(255,255,255,0.25) inset;
+  transition:transform 0.15s,box-shadow 0.15s;
+}
+.btn-primary:hover { transform:translateY(-1px); box-shadow:0 8px 28px rgba(240,184,64,0.55); }
+.btn-primary svg { width:13px; height:13px; stroke:var(--navy-900); fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+.btn-ghost-sm {
+  display:flex; align-items:center; gap:7px;
+  background:var(--navy-550); color:var(--text-2);
+  border:1px solid var(--border-2); border-radius:var(--r-chip);
+  padding:11px 16px; font-size:13px; font-weight:600;
+  font-family:'Inter',sans-serif; cursor:pointer; transition:all 0.15s;
+}
+.btn-ghost-sm:hover { border-color:var(--border-g); color:var(--text-1); }
+.btn-ghost-sm svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+
+/* KPI */
+.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--sp-xs); padding:0 var(--sp-md); margin-bottom:var(--sp-sm); }
+.kpi-card {
+  height:var(--kpi-h);
+  background:linear-gradient(145deg,var(--navy-550) 0%,var(--navy-700) 100%);
+  border:1px solid var(--border-2); border-radius:var(--r-card);
+  padding:var(--sp-sm); position:relative; overflow:hidden;
+  display:flex; flex-direction:column; justify-content:space-between;
+  box-shadow:0 1px 0 rgba(255,255,255,0.06) inset,0 4px 16px rgba(0,0,0,0.40),0 16px 48px rgba(0,0,0,0.30);
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.kpi-card:hover { transform:translateY(-3px); box-shadow:0 8px 28px rgba(0,0,0,0.50),0 24px 60px rgba(0,0,0,0.35); }
+.kpi-card.accent {
+  background:linear-gradient(145deg,rgba(240,184,64,0.18) 0%,var(--navy-550) 45%,var(--navy-700) 100%);
+  border-color:var(--border-g);
+  box-shadow:0 1px 0 rgba(240,184,64,0.18) inset,0 4px 16px rgba(0,0,0,0.40),0 0 60px rgba(240,184,64,0.06),0 16px 48px rgba(0,0,0,0.30);
+}
+.kpi-card::after { content:''; position:absolute; top:-40px; right:-40px; width:130px; height:130px; border-radius:50%; pointer-events:none; }
+.kpi-card.accent::after { background:radial-gradient(circle,rgba(240,184,64,0.22) 0%,transparent 70%); }
+.kpi-card.plain1::after { background:radial-gradient(circle,rgba(100,140,255,0.08) 0%,transparent 70%); }
+.kpi-top { display:flex; align-items:center; justify-content:space-between; }
+.kpi-icon { width:36px; height:36px; border-radius:var(--r-chip); display:flex; align-items:center; justify-content:center; }
+.kpi-icon svg { width:17px; height:17px; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.kpi-icon.gold  { background:var(--gold-dim); border:1px solid var(--border-g); }
+.kpi-icon.gold svg { stroke:var(--gold-hi); }
+.kpi-icon.plain { background:rgba(255,255,255,0.07); border:1px solid var(--border-2); }
+.kpi-icon.plain svg { stroke:var(--text-2); }
+.kpi-badge { font-size:10px; font-weight:700; padding:3px 9px; border-radius:var(--r-tag); background:rgba(30,214,136,0.15); color:var(--green-hi); border:1px solid rgba(30,214,136,0.25); }
+.kpi-val { font-size:40px; font-weight:900; letter-spacing:-2px; line-height:1; color:var(--text-1); text-shadow:0 2px 12px rgba(0,0,0,0.3); }
+.kpi-val.gold { color:var(--gold-hi); text-shadow:0 0 30px rgba(240,184,64,0.35),0 2px 12px rgba(0,0,0,0.3); }
+.kpi-label { font-size:13px; color:var(--text-2); font-weight:500; }
+.kpi-sub   { font-size:11px; color:var(--text-4); font-weight:500; }
+
+/* SECTION HEADER */
+.sec-hd { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:var(--sp-xs); }
+.sec-title { font-size:15px; font-weight:700; color:var(--text-1); letter-spacing:-0.3px; }
+.sec-meta  { font-size:12px; color:var(--text-3); margin-top:2px; }
+.filter-row { display:flex; gap:5px; }
+.fp { font-size:11px; font-weight:600; padding:5px 12px; border-radius:var(--r-pill); cursor:pointer; border:1px solid var(--border-2); background:var(--navy-550); color:var(--text-3); transition:all 0.15s; }
+.fp:hover { color:var(--text-1); }
+.fp.active { background:var(--gold-dim); border-color:var(--border-g); color:var(--gold-hi); }
+
+/* MAIN GRID */
+.main-grid { display:grid; grid-template-columns:1fr 320px; gap:var(--sp-xs); padding:0 var(--sp-md); margin-bottom:var(--sp-xs); }
+
+/* PIPELINE TABLE */
+.pipe-wrap {
+  background:linear-gradient(180deg,var(--navy-550) 0%,var(--navy-700) 100%);
+  border:1px solid var(--border-2); border-radius:var(--r-card); overflow:hidden;
+  box-shadow:0 1px 0 rgba(255,255,255,0.06) inset,0 4px 20px rgba(0,0,0,0.45),0 20px 55px rgba(0,0,0,0.30);
+}
+.pipe-table { width:100%; border-collapse:collapse; }
+.pipe-table th {
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em;
+  color:var(--text-2); padding:var(--sp-xs) var(--sp-sm);
+  text-align:left; border-bottom:1px solid var(--border-2);
+  background:linear-gradient(90deg,var(--navy-700) 0%,var(--navy-600) 100%);
+  white-space:nowrap;
+}
+.pipe-table td { padding:14px var(--sp-sm); border-bottom:1px solid var(--border); font-size:13px; vertical-align:middle; }
+.pipe-table tr:last-child td { border-bottom:none; }
+.pipe-table tbody tr { transition:background 0.12s; }
+.pipe-table tbody tr:hover td { background:rgba(255,255,255,0.03); }
+.pipe-table tr.overdue td:first-child { border-left:3px solid var(--red); padding-left:calc(var(--sp-sm) - 3px); }
+.pipe-table tr:not(.overdue) td:first-child { border-left:3px solid transparent; padding-left:calc(var(--sp-sm) - 3px); }
+.pipe-table tbody tr.overdue:hover td { background:rgba(255,51,51,0.06); }
+.lead-name { font-size:13px; font-weight:700; color:var(--text-1); }
+.lead-sub  { font-size:12px; color:var(--text-3); margin-top:1px; }
+.sp { display:inline-flex; align-items:center; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; padding:4px 10px; border-radius:var(--r-pill); white-space:nowrap; border:1px solid; }
+.sp-new       { color:var(--text-3);  background:var(--navy-500);       border-color:var(--border-2); }
+.sp-contacted { color:var(--gold-hi); background:var(--gold-dim);       border-color:var(--border-g); }
+.sp-quote     { color:var(--text-2);  background:rgba(255,255,255,0.07);border-color:var(--border-2); }
+.sp-app       { color:#ffd070;        background:rgba(255,200,80,0.10); border-color:rgba(255,200,80,0.25); }
+.sp-issued    { color:var(--green-hi);background:var(--green-dim);      border-color:rgba(30,214,136,0.25); }
+.agent-chip { display:flex; align-items:center; gap:8px; cursor:pointer; }
+.ag-av { width:28px; height:28px; border-radius:8px; font-size:9px; font-weight:800; color:var(--gold-hi); display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1px solid var(--border-g); box-shadow:0 2px 8px rgba(0,0,0,0.4),0 0 0 2px var(--gold-glow); }
+.ag-name { font-size:13px; font-weight:600; color:var(--text-2); }
+.agent-chip:hover .ag-name { color:var(--gold-hi); }
+.d-ok   { font-size:12px; font-weight:600; color:var(--text-4); }
+.d-warn { font-size:12px; font-weight:700; color:var(--amber); }
+.d-hot  { font-size:12px; font-weight:800; color:var(--red-hi); display:flex; align-items:center; gap:4px; text-shadow:0 0 12px rgba(255,51,51,0.4); }
+.d-hot svg { width:13px; height:13px; stroke:var(--red-hi); fill:none; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.row-actions { display:flex; gap:5px; opacity:0; transition:opacity 0.12s; }
+.pipe-table tr:hover .row-actions { opacity:1; }
+.ra { font-size:10px; font-weight:700; padding:4px 10px; border-radius:var(--r-pill); cursor:pointer; font-family:'Inter',sans-serif; white-space:nowrap; border:1px solid; transition:all 0.12s; }
+.ra-nudge    { background:var(--gold-dim); border-color:var(--border-g); color:var(--gold-hi); }
+.ra-nudge:hover { background:var(--gold-mid); }
+.ra-reassign { background:var(--navy-500); border-color:var(--border-2); color:var(--text-2); }
+.ra-reassign:hover { border-color:var(--border-g); color:var(--text-1); }
+
+/* TEAM PANEL */
+.team-panel {
+  background:linear-gradient(180deg,var(--navy-550) 0%,var(--navy-700) 100%);
+  border:1px solid var(--border-2); border-radius:var(--r-card); overflow:hidden;
+  box-shadow:0 1px 0 rgba(255,255,255,0.06) inset,0 4px 20px rgba(0,0,0,0.45),0 20px 55px rgba(0,0,0,0.30);
+}
+.team-card { padding:var(--sp-sm); border-bottom:1px solid var(--border); }
+.team-card:last-child { border-bottom:none; }
+.tc-top { display:flex; align-items:center; gap:var(--sp-xs); margin-bottom:var(--sp-xs); }
+.tc-av {
+  width:42px; height:42px; border-radius:var(--r-chip);
+  font-size:13px; font-weight:800; color:var(--gold-hi);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  border:1.5px solid var(--border-g);
+  box-shadow:0 0 0 4px var(--gold-glow),0 0 16px rgba(240,184,64,0.12),0 4px 12px rgba(0,0,0,0.4);
+  cursor:pointer; transition:box-shadow 0.15s;
+}
+.tc-av:hover { box-shadow:0 0 0 4px var(--gold-mid),0 0 24px rgba(240,184,64,0.25),0 4px 12px rgba(0,0,0,0.4); }
+.tc-name   { font-size:14px; font-weight:700; color:var(--text-1); letter-spacing:-0.2px; cursor:pointer; }
+.tc-name:hover { color:var(--gold-hi); }
+.tc-states { font-size:11px; color:var(--text-3); margin-top:2px; }
+.tc-status { display:flex; flex-direction:column; align-items:flex-end; gap:3px; margin-left:auto; }
+.status-dot { width:8px; height:8px; border-radius:50%; }
+.status-dot.on  { background:var(--green-hi); box-shadow:0 0 0 3px var(--green-dim),0 0 8px rgba(30,214,136,0.4); }
+.status-dot.off { background:var(--text-4); }
+.status-lbl { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; }
+.status-lbl.on  { color:var(--green-hi); }
+.status-lbl.off { color:var(--text-4); }
+.tc-stats { display:grid; grid-template-columns:1fr 1fr 1fr; margin-bottom:var(--sp-xs); }
+.tcs { display:flex; flex-direction:column; gap:3px; padding-right:var(--sp-xs); }
+.tcs:not(:last-child) { border-right:1px solid var(--border); margin-right:var(--sp-xs); }
+.tcs-val { font-size:22px; font-weight:900; letter-spacing:-0.5px; color:var(--text-1); }
+.tcs-val.gold { color:var(--gold-hi); text-shadow:0 0 20px rgba(240,184,64,0.25); }
+.tcs-val.warn { color:var(--red-hi);  text-shadow:0 0 16px rgba(255,51,51,0.35); }
+.tcs-key { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-4); }
+.tc-foot { display:flex; align-items:center; justify-content:space-between; }
+.tc-last { font-size:11px; color:var(--text-4); font-weight:500; }
+.tc-last.warn { color:var(--red-hi); font-weight:700; }
+.tc-btn { font-size:11px; font-weight:700; padding:6px 14px; border-radius:var(--r-pill); cursor:pointer; font-family:'Inter',sans-serif; border:1px solid; transition:all 0.12s; }
+.tc-btn.msg   { background:var(--gold-dim); border-color:var(--border-g); color:var(--gold-hi); }
+.tc-btn.msg:hover { background:var(--gold-mid); }
+.tc-btn.nudge { background:var(--red-dim); border-color:var(--red-mid); color:var(--red-hi); box-shadow:0 0 12px rgba(255,51,51,0.15); }
+.tc-btn.nudge:hover { background:var(--red-mid); }
+
+/* RED FLAGS */
+.flags-section { padding:0 var(--sp-md) var(--sp-md); }
+.flag-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--sp-xs); }
+.flag-card { border-radius:var(--r-card); padding:var(--sp-sm); position:relative; overflow:hidden; }
+.flag-card.danger { background:linear-gradient(145deg,rgba(255,51,51,0.18) 0%,var(--navy-550) 40%,var(--navy-700) 100%); border:1px solid rgba(255,51,51,0.30); box-shadow:0 1px 0 rgba(255,51,51,0.12) inset,0 4px 20px rgba(0,0,0,0.45),0 0 60px rgba(255,51,51,0.06),0 20px 55px rgba(0,0,0,0.30); }
+.flag-card.warn   { background:linear-gradient(145deg,rgba(240,184,64,0.16) 0%,var(--navy-550) 40%,var(--navy-700) 100%); border:1px solid var(--border-g); box-shadow:0 1px 0 rgba(240,184,64,0.12) inset,0 4px 20px rgba(0,0,0,0.45),0 0 60px rgba(240,184,64,0.05),0 20px 55px rgba(0,0,0,0.30); }
+.flag-card.info   { background:linear-gradient(145deg,rgba(100,140,255,0.08) 0%,var(--navy-550) 40%,var(--navy-700) 100%); border:1px solid var(--border-2); box-shadow:0 1px 0 rgba(255,255,255,0.06) inset,0 4px 20px rgba(0,0,0,0.45),0 20px 55px rgba(0,0,0,0.30); }
+.flag-card::after { content:''; position:absolute; top:-50px; right:-50px; width:150px; height:150px; border-radius:50%; pointer-events:none; }
+.flag-card.danger::after { background:radial-gradient(circle,rgba(255,51,51,0.22) 0%,transparent 70%); }
+.flag-card.warn::after   { background:radial-gradient(circle,rgba(240,184,64,0.20) 0%,transparent 70%); }
+.flag-card.info::after   { background:radial-gradient(circle,rgba(100,140,255,0.10) 0%,transparent 70%); }
+.flag-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:var(--sp-xs); }
+.flag-ico { width:36px; height:36px; border-radius:var(--r-chip); display:flex; align-items:center; justify-content:center; }
+.flag-ico svg { width:18px; height:18px; fill:none; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.flag-ico.danger { background:rgba(255,51,51,0.15); border:1px solid rgba(255,51,51,0.35); }
+.flag-ico.danger svg { stroke:var(--red-hi); }
+.flag-ico.warn   { background:var(--gold-dim); border:1px solid var(--border-g); }
+.flag-ico.warn svg { stroke:var(--gold-hi); }
+.flag-ico.info   { background:rgba(100,140,255,0.10); border:1px solid rgba(100,140,255,0.20); }
+.flag-ico.info svg { stroke:#8aacff; }
+.flag-num { font-size:52px; font-weight:900; letter-spacing:-3px; line-height:1; position:relative; z-index:1; }
+.flag-num.danger { color:var(--red-hi);  text-shadow:0 0 30px rgba(255,51,51,0.50),0 0 60px rgba(255,51,51,0.20); }
+.flag-num.warn   { color:var(--gold-hi); text-shadow:0 0 30px rgba(240,184,64,0.45),0 0 60px rgba(240,184,64,0.18); }
+.flag-num.info   { color:#8aacff;        text-shadow:0 0 24px rgba(100,140,255,0.30); }
+.flag-title { font-size:15px; font-weight:800; color:var(--text-1); margin-bottom:5px; letter-spacing:-0.3px; }
+.flag-body  { font-size:13px; color:var(--text-3); line-height:1.55; margin-bottom:var(--sp-xs); }
+.flag-leads { display:flex; flex-direction:column; gap:6px; margin-bottom:var(--sp-xs); }
+.fl-row { display:flex; align-items:center; justify-content:space-between; padding:9px 12px; background:rgba(255,255,255,0.04); border-radius:var(--r-chip); border:1px solid var(--border); }
+.fl-name { font-size:13px; font-weight:700; color:var(--text-1); }
+.fl-meta { font-size:11px; color:var(--text-3); margin-top:1px; }
+.fl-tag  { font-size:9px; font-weight:700; padding:2px 8px; border-radius:var(--r-tag); border:1px solid; white-space:nowrap; }
+.fl-tag.hot      { background:rgba(255,51,51,0.15);  color:var(--red-hi);  border-color:rgba(255,51,51,0.35); }
+.fl-tag.new      { background:var(--navy-500); color:var(--text-2); border-color:var(--border-2); }
+.fl-tag.seq      { background:var(--gold-dim); color:var(--gold-hi); border-color:var(--border-g); }
+.fl-tag.late     { background:rgba(255,51,51,0.15);  color:var(--red-hi);  border-color:rgba(255,51,51,0.35); }
+.fl-tag.inactive { background:rgba(255,51,51,0.15);  color:var(--red-hi);  border-color:rgba(255,51,51,0.35); }
+.flag-cta { width:100%; padding:11px 0; border-radius:var(--r-chip); font-size:13px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer; border:1px solid; letter-spacing:-0.1px; transition:all 0.15s; }
+.flag-cta.danger { background:rgba(255,51,51,0.14); border-color:rgba(255,51,51,0.35); color:var(--red-hi); box-shadow:0 0 16px rgba(255,51,51,0.12); }
+.flag-cta.danger:hover { background:rgba(255,51,51,0.22); transform:translateY(-1px); }
+.flag-cta.warn   { background:var(--gold-dim); border-color:var(--border-g); color:var(--gold-hi); box-shadow:0 0 16px rgba(240,184,64,0.12); }
+.flag-cta.warn:hover { background:var(--gold-mid); transform:translateY(-1px); }
+.flag-cta.info   { background:rgba(100,140,255,0.08); border-color:rgba(100,140,255,0.20); color:#8aacff; }
+.flag-cta.info:hover { background:rgba(100,140,255,0.14); transform:translateY(-1px); }
+
+/* ══════════════════════════════
+   AGENT DETAIL PAGE
+══════════════════════════════ */
+.agent-hero {
+  margin:var(--sp-md) var(--sp-md) var(--sp-sm);
+  background:linear-gradient(135deg,rgba(240,184,64,0.12) 0%,var(--navy-550) 40%,var(--navy-700) 100%);
+  border:1px solid var(--border-g); border-radius:var(--r-card);
+  padding:var(--sp-md); display:flex; align-items:center; gap:var(--sp-md);
+  position:relative; overflow:hidden;
+  box-shadow:0 1px 0 rgba(240,184,64,0.10) inset,0 8px 32px rgba(0,0,0,0.40);
+}
+.agent-hero::after { content:''; position:absolute; top:-60px; right:-60px; width:200px; height:200px; border-radius:50%; background:radial-gradient(circle,rgba(240,184,64,0.15) 0%,transparent 70%); pointer-events:none; }
+.hero-av {
+  width:72px; height:72px; border-radius:20px;
+  font-size:22px; font-weight:900; color:var(--gold-hi);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  border:2px solid var(--border-g);
+  box-shadow:0 0 0 6px var(--gold-glow),0 0 30px rgba(240,184,64,0.18),0 8px 20px rgba(0,0,0,0.5);
+}
+.hero-info { flex:1; }
+.hero-name { font-size:30px; font-weight:900; letter-spacing:-1px; color:var(--text-1); line-height:1; }
+.hero-role { font-size:13px; color:var(--text-3); margin-top:4px; }
+.hero-tags { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+.hero-tag  { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; padding:4px 10px; border-radius:var(--r-tag); background:var(--gold-dim); border:1px solid var(--border-g); color:var(--gold-hi); }
+.hero-stats { display:flex; gap:var(--sp-md); }
+.hs { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.hs-val { font-size:28px; font-weight:900; letter-spacing:-1px; color:var(--gold-hi); text-shadow:0 0 20px rgba(240,184,64,0.30); }
+.hs-key { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-4); }
+
+.agent-lead-table {
+  margin:0 var(--sp-md) var(--sp-md);
+  background:linear-gradient(180deg,var(--navy-550) 0%,var(--navy-700) 100%);
+  border:1px solid var(--border-2); border-radius:var(--r-card); overflow:hidden;
+  box-shadow:0 4px 20px rgba(0,0,0,0.40),0 20px 55px rgba(0,0,0,0.30);
+}
+.alt-hd { padding:var(--sp-sm) var(--sp-sm) var(--sp-xs); display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border-2); }
+.alt-title { font-size:15px; font-weight:700; color:var(--text-1); }
+.alt-meta  { font-size:12px; color:var(--text-3); }
+
+/* ══════════════════════════════
+   PERFORMANCE PAGE
+══════════════════════════════ */
+.perf-grid { display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-xs); padding:0 var(--sp-md) var(--sp-md); }
+.perf-card {
+  background:linear-gradient(145deg,var(--navy-550) 0%,var(--navy-700) 100%);
+  border:1px solid var(--border-2); border-radius:var(--r-card); padding:var(--sp-sm);
+  box-shadow:0 4px 20px rgba(0,0,0,0.40),0 20px 55px rgba(0,0,0,0.30);
+}
+.perf-card.full { grid-column:1/-1; }
+.perf-title { font-size:15px; font-weight:700; color:var(--text-1); margin-bottom:var(--sp-xs); }
+.perf-sub   { font-size:12px; color:var(--text-3); margin-bottom:var(--sp-sm); }
+
+/* Bar chart */
+.bar-chart { display:flex; flex-direction:column; gap:12px; }
+.bar-row { display:flex; align-items:center; gap:var(--sp-xs); }
+.bar-label { width:120px; font-size:12px; font-weight:600; color:var(--text-2); flex-shrink:0; }
+.bar-track { flex:1; height:28px; background:var(--navy-500); border-radius:6px; overflow:hidden; position:relative; }
+.bar-fill {
+  height:100%; border-radius:6px;
+  display:flex; align-items:center; padding-left:10px;
+  font-size:11px; font-weight:700; color:var(--navy-900);
+  transition:width 1s ease;
+}
+.bar-fill.gold   { background:linear-gradient(90deg,var(--gold) 0%,var(--gold-hi) 100%); box-shadow:0 0 12px rgba(240,184,64,0.40); }
+.bar-fill.green  { background:linear-gradient(90deg,var(--green) 0%,var(--green-hi) 100%); box-shadow:0 0 12px rgba(30,214,136,0.40); color:#fff; }
+.bar-fill.blue   { background:linear-gradient(90deg,#4a8cf7 0%,#7aacff 100%); box-shadow:0 0 12px rgba(74,140,247,0.40); color:#fff; }
+.bar-val { width:44px; text-align:right; font-size:13px; font-weight:700; color:var(--text-1); flex-shrink:0; }
+
+/* Leaderboard */
+.leaderboard { display:flex; flex-direction:column; gap:8px; }
+.lb-row {
+  display:flex; align-items:center; gap:var(--sp-xs);
+  padding:12px var(--sp-sm); background:rgba(255,255,255,0.04);
+  border-radius:var(--r-chip); border:1px solid var(--border);
+  transition:background 0.15s;
+}
+.lb-row:hover { background:rgba(255,255,255,0.07); }
+.lb-rank { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0; }
+.lb-rank.gold  { background:var(--gold-dim); color:var(--gold-hi); border:1px solid var(--border-g); }
+.lb-rank.two   { background:rgba(255,255,255,0.07); color:var(--text-2); border:1px solid var(--border-2); }
+.lb-rank.three { background:rgba(255,255,255,0.05); color:var(--text-3); border:1px solid var(--border); }
+.lb-av { width:34px; height:34px; border-radius:10px; font-size:11px; font-weight:800; color:var(--gold-hi); display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1px solid var(--border-g); }
+.lb-info { flex:1; }
+.lb-name   { font-size:13px; font-weight:700; color:var(--text-1); }
+.lb-states { font-size:11px; color:var(--text-3); }
+.lb-stats  { display:flex; gap:var(--sp-sm); }
+.lb-stat   { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+.lb-stat-val { font-size:16px; font-weight:900; letter-spacing:-0.5px; color:var(--text-1); }
+.lb-stat-val.gold { color:var(--gold-hi); }
+.lb-stat-key { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-4); }
+
+/* ══════════════════════════════
+   BACK BUTTON (sub pages)
+══════════════════════════════ */
+.back-bar {
+  display:flex; align-items:center; gap:10px;
+  padding:var(--sp-sm) var(--sp-md) 0;
+  margin-bottom:var(--sp-xs);
+}
+.back-btn {
+  display:flex; align-items:center; gap:7px;
+  background:var(--navy-550); border:1px solid var(--border-2);
+  border-radius:var(--r-chip); padding:8px 14px;
+  font-size:12px; font-weight:600; color:var(--text-2);
+  font-family:'Inter',sans-serif; cursor:pointer; transition:all 0.15s;
+}
+.back-btn:hover { border-color:var(--border-g); color:var(--text-1); }
+.back-btn svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.back-page-title { font-size:20px; font-weight:900; letter-spacing:-0.6px; color:var(--text-1); }
+
+/* ══════════════════════════════
+   TOUR OVERLAY
+══════════════════════════════ */
+.tour-overlay {
+  display:none;
+  position:fixed; inset:0; z-index:200;
+  pointer-events:none;
+}
+.tour-overlay.active { display:block; }
+
+.tour-svg-backdrop {
+  position:fixed; inset:0; width:100%; height:100%;
+  pointer-events:all; cursor:default;
+}
+
+.tour-highlight {
+  position:fixed;
+  border-radius:var(--r-card);
+  border:2.5px solid var(--gold);
+  box-shadow:0 0 0 4px rgba(240,184,64,0.20), 0 0 40px rgba(240,184,64,0.30);
+  pointer-events:none; z-index:202;
+  transition:left 0.4s cubic-bezier(0.4,0,0.2,1), top 0.4s cubic-bezier(0.4,0,0.2,1), width 0.4s cubic-bezier(0.4,0,0.2,1), height 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+.tour-tooltip {
+  position:fixed;
+  background:linear-gradient(145deg,var(--navy-550) 0%,var(--navy-700) 100%);
+  border:1px solid var(--border-g); border-radius:var(--r-card);
+  padding:var(--sp-sm); width:300px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.70),0 0 0 1px rgba(240,184,64,0.10),0 0 40px rgba(240,184,64,0.08);
+  pointer-events:all; z-index:203;
+  transition:left 0.4s cubic-bezier(0.4,0,0.2,1), top 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.tt-step { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:var(--gold-hi); margin-bottom:6px; }
+.tt-title { font-size:17px; font-weight:800; color:var(--text-1); letter-spacing:-0.4px; margin-bottom:6px; }
+.tt-body  { font-size:13px; color:var(--text-3); line-height:1.6; margin-bottom:var(--sp-sm); }
+.tt-actions { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.tt-dots { display:flex; gap:5px; }
+.tt-dot { width:6px; height:6px; border-radius:50%; background:var(--navy-400); transition:all 0.2s; }
+.tt-dot.active { background:var(--gold-hi); width:16px; border-radius:3px; }
+.tt-btns { display:flex; gap:8px; }
+.tt-btn-next {
+  background:var(--gold); color:var(--navy-900); border:none;
+  border-radius:var(--r-pill); padding:8px 18px;
+  font-size:12px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer;
+  box-shadow:0 4px 14px rgba(240,184,64,0.35);
+  transition:all 0.15s;
+}
+.tt-btn-next:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(240,184,64,0.45); }
+.tt-btn-skip {
+  background:transparent; color:var(--text-3); border:none;
+  font-size:12px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer;
+}
+.tt-btn-skip:hover { color:var(--text-2); }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="nav-brand">
+    <div class="nav-logo">ISG<span>.</span></div>
+    <div class="nav-pipe"></div>
+    <div class="nav-label">Manager Dashboard</div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-date">Sunday, June 14, 2026</div>
+    <button class="tour-btn" onclick="startTour()">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Take the Tour
+    </button>
+    <div class="nav-icon-btn">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="notif-dot"></div>
+    </div>
+    <div class="nav-avatar">IS</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-section">
+      <div class="sb-eyebrow">Overview</div>
+      <div class="sb-item active" id="sb-dashboard" onclick="showPage('dashboard')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </div>
+      <div class="sb-item" id="sb-agents" onclick="showPage('agents')">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Agents <span class="sb-badge gold">10</span>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-eyebrow">Pipeline</div>
+      <div class="sb-item">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        All Leads <span class="sb-badge gold">47</span>
+      </div>
+      <div class="sb-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Red Flags <span class="sb-badge red">6</span>
+      </div>
+      <div class="sb-item">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Sequences
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-eyebrow">Reports</div>
+      <div class="sb-item" id="sb-perf" onclick="showPage('performance')">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Performance
+      </div>
+      <div class="sb-item">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Activity Log
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ══ DASHBOARD PAGE ══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Good morning, ISG.</div>
+          <div class="page-sub">Here's where your business stands right now.</div>
+        </div>
+        <div class="hd-actions">
+          <button class="btn-ghost-sm"><svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="18" y2="18"/></svg>Filter</button>
+          <button class="btn-primary"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Lead</button>
+        </div>
+      </div>
+
+      <!-- KPI Row -->
+      <div class="kpi-row" id="tour-kpi">
+        <div class="kpi-card accent">
+          <div class="kpi-top"><div class="kpi-icon gold"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="kpi-badge">+9 this mo</span></div>
+          <div class="kpi-val gold">47</div>
+          <div><div class="kpi-label">Active Leads</div><div class="kpi-sub">Across 10 agents</div></div>
+        </div>
+        <div class="kpi-card plain1">
+          <div class="kpi-top"><div class="kpi-icon plain"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.43 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.08 6.08l.98-.98a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><span class="kpi-badge">+6% vs last</span></div>
+          <div class="kpi-val">31%</div>
+          <div><div class="kpi-label">Team Contact Rate</div><div class="kpi-sub">Up from 25% last month</div></div>
+        </div>
+        <div class="kpi-card plain1">
+          <div class="kpi-top"><div class="kpi-icon plain"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="kpi-badge">+4 vs last</span></div>
+          <div class="kpi-val">18</div>
+          <div><div class="kpi-label">Policies Issued MTD</div><div class="kpi-sub">14 same point last month</div></div>
+        </div>
+        <div class="kpi-card accent">
+          <div class="kpi-top"><div class="kpi-icon gold"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><span class="kpi-badge">+$7.4k</span></div>
+          <div class="kpi-val gold">$31.2k</div>
+          <div><div class="kpi-label">Est. Commission MTD</div><div class="kpi-sub">$23.8k same point last month</div></div>
+        </div>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="main-grid">
+        <!-- Pipeline -->
+        <div id="tour-pipeline">
+          <div class="sec-hd">
+            <div><div class="sec-title">Live Pipeline</div><div class="sec-meta">47 leads across all agents</div></div>
+            <div class="filter-row"><div class="fp active">All</div><div class="fp">HOT</div><div class="fp">Stalled</div><div class="fp">Overdue</div></div>
+          </div>
+          <div class="pipe-wrap">
+            <table class="pipe-table">
+              <thead><tr><th>Lead</th><th>Agent</th><th>Stage</th><th>State</th><th>Last Touch</th><th>Days Silent</th><th></th></tr></thead>
+              <tbody>
+                <tr class="overdue">
+                  <td><div class="lead-name">James T.</div><div class="lead-sub">Veteran · 58 · Whole Life</div></td>
+                  <td><div class="agent-chip" onclick="showPage('agents')"><div class="ag-av" style="background:var(--navy-500);">AT</div><span class="ag-name">Torres</span></div></td>
+                  <td><span class="sp sp-contacted">Contacted</span></td>
+                  <td style="font-size:13px;font-weight:700;color:var(--text-1);">IL</td>
+                  <td style="font-size:12px;color:var(--text-3);">Jun 9</td>
+                  <td><div class="d-hot">5d<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div></td>
+                  <td><div class="row-actions"><button class="ra ra-nudge">Nudge</button><button class="ra ra-reassign">Reassign</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="lead-name">Sarah M.</div><div class="lead-sub">Vet Spouse · 42 · Whole Life</div></td>
+                  <td><div class="agent-chip" onclick="showPage('agents')"><div class="ag-av" style="background:var(--navy-500);">AT</div><span class="ag-name">Torres</span></div></td>
+                  <td><span class="sp sp-quote">Quote Sent</span></td>
+                  <td style="font-size:13px;font-weight:700;color:var(--text-1);">WA</td>
+                  <td style="font-size:12px;color:var(--text-3);">Jun 12</td>
+                  <td><div class="d-warn">2d</div></td>
+                  <td><div class="row-actions"><button class="ra ra-nudge">Nudge</button><button class="ra ra-reassign">Reassign</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="lead-name">David H.</div><div class="lead-sub">Trucker · 51 · Whole Life</div></td>
+                  <td><div class="agent-chip" onclick="showPage('agents')"><div class="ag-av" style="background:var(--navy-500);">AT</div><span class="ag-name">Torres</span></div></td>
+                  <td><span class="sp sp-contacted">Contacted</span></td>
+                  <td style="font-size:13px;font-weight:700;color:var(--text-1);">IL</td>
+                  <td style="font-size:12px;color:var(--text-3);">Jun 9</td>
+                  <td><div class="d-warn">Day 5</div></td>
+                  <td><div class="row-actions"><button class="ra ra-nudge">Nudge</button><button class="ra ra-reassign">Reassign</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="lead-name">Tom K.</div><div class="lead-sub">Veteran · 61 · Whole Life</div></td>
+                  <td><div class="agent-chip"><div class="ag-av" style="background:linear-gradient(135deg,#0e2015,#1a3522);">AJ</div><span class="ag-name">Johnson</span></div></td>
+                  <td><span class="sp sp-app">Application</span></td>
+                  <td style="font-size:13px;font-weight:700;color:var(--text-1);">IL</td>
+                  <td style="font-size:12px;color:var(--text-3);">Jun 13</td>
+                  <td><div class="d-ok">1d</div></td>
+                  <td><div class="row-actions"><button class="ra ra-nudge">Nudge</button><button class="ra ra-reassign">Reassign</button></div></td>
+                </tr>
+                <tr class="overdue">
+                  <td><div class="lead-name">Ray V.</div><div class="lead-sub">Trucker · 46 · Whole Life</div></td>
+                  <td><div class="agent-chip"><div class="ag-av" style="background:linear-gradient(135deg,#1e0e2a,#2d1840);">AW</div><span class="ag-name">Williams</span></div></td>
+                  <td><span class="sp sp-new">New</span></td>
+                  <td style="font-size:13px;font-weight:700;color:var(--text-1);">TX</td>
+                  <td style="font-size:12px;color:var(--text-3);">Jun 10</td>
+                  <td><div class="d-hot">4d<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div></td>
+                  <td><div class="row-actions"><button class="ra ra-nudge">Nudge</button><button class="ra ra-reassign">Reassign</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="lead-name">Linda P.</div><div class="lead-sub">Trucker · 39 · Whole Life</div></td>
+                  <td><div class="agent-chip"><div class="ag-av" style="background:linear-gradient(135deg,#0e2015,#1a3522);">AJ</div><span class="ag-name">Johnson</span></div></td>
+                  <td><span class="sp sp-quote">Quote Sent</span></td>
+                  <td style="font-size:13px;font-weight:700;color:var(--text-1);">OH</td>
+                  <td style="font-size:12px;color:var(--text-3);">Jun 11</td>
+                  <td><div class="d-warn">3d</div></td>
+                  <td><div class="row-actions"><button class="ra ra-nudge">Nudge</button><button class="ra ra-reassign">Reassign</button></div></td>
+                </tr>
+                <tr>
+                  <td><div class="lead-name">Diane W.</div><div class="lead-sub">Veteran · 55 · Whole Life</div></td>
+                  <td><div class="agent-chip"><div class="ag-av" style="background:linear-gradient(135deg,#1e0e2a,#2d1840);">AW</div><span class="ag-name">Williams</span></div></td>
+                  <td><span class="sp sp-issued">Issued ✓</span></td>
+                  <td style="font-size:13px;font-weight:700;color:var(--text-1);">IL</td>
+                  <td style="font-size:12px;color:var(--text-3);">Jun 10</td>
+                  <td><div class="d-ok">—</div></td>
+                  <td><div class="row-actions"><button class="ra ra-reassign">View</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Team -->
+        <div id="tour-team">
+          <div class="sec-hd"><div><div class="sec-title">Team Activity</div><div class="sec-meta">Today · 3 of 10 shown</div></div></div>
+          <div class="team-panel">
+            <div class="team-card">
+              <div class="tc-top">
+                <div class="tc-av" style="background:linear-gradient(135deg,var(--navy-500),var(--navy-400));" onclick="showPage('agents')">AT</div>
+                <div><div class="tc-name" onclick="showPage('agents')">Agent Torres</div><div class="tc-states">IL · WA · VA</div></div>
+                <div class="tc-status"><div class="status-dot on"></div><div class="status-lbl on">Active</div></div>
+              </div>
+              <div class="tc-stats">
+                <div class="tcs"><div class="tcs-val gold">28</div><div class="tcs-key">Leads</div></div>
+                <div class="tcs"><div class="tcs-val">4</div><div class="tcs-key">Touches</div></div>
+                <div class="tcs" style="border:none;margin:0;padding:0;"><div class="tcs-val">6</div><div class="tcs-key">Issued</div></div>
+              </div>
+              <div class="tc-foot"><div class="tc-last">Active 12 min ago</div><button class="tc-btn msg">Message</button></div>
+            </div>
+            <div class="team-card">
+              <div class="tc-top">
+                <div class="tc-av" style="background:linear-gradient(135deg,#0e2015,#1a3522);">AJ</div>
+                <div><div class="tc-name">Agent Johnson</div><div class="tc-states">IL · OH · MI</div></div>
+                <div class="tc-status"><div class="status-dot on"></div><div class="status-lbl on">Active</div></div>
+              </div>
+              <div class="tc-stats">
+                <div class="tcs"><div class="tcs-val gold">21</div><div class="tcs-key">Leads</div></div>
+                <div class="tcs"><div class="tcs-val">2</div><div class="tcs-key">Touches</div></div>
+                <div class="tcs" style="border:none;margin:0;padding:0;"><div class="tcs-val">4</div><div class="tcs-key">Issued</div></div>
+              </div>
+              <div class="tc-foot"><div class="tc-last">Active 34 min ago</div><button class="tc-btn msg">Message</button></div>
+            </div>
+            <div class="team-card">
+              <div class="tc-top">
+                <div class="tc-av" style="background:linear-gradient(135deg,#1e0e2a,#2d1840);">AW</div>
+                <div><div class="tc-name">Agent Williams</div><div class="tc-states">CA · NJ · SC</div></div>
+                <div class="tc-status"><div class="status-dot off"></div><div class="status-lbl off">Offline</div></div>
+              </div>
+              <div class="tc-stats">
+                <div class="tcs"><div class="tcs-val gold">19</div><div class="tcs-key">Leads</div></div>
+                <div class="tcs"><div class="tcs-val warn">0</div><div class="tcs-key">Touches</div></div>
+                <div class="tcs" style="border:none;margin:0;padding:0;"><div class="tcs-val">3</div><div class="tcs-key">Issued</div></div>
+              </div>
+              <div class="tc-foot"><div class="tc-last warn">No activity today</div><button class="tc-btn nudge">Nudge</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Red Flags -->
+      <div class="flags-section" id="tour-flags">
+        <div class="sec-hd" style="margin-bottom:var(--sp-xs);"><div><div class="sec-title">Red Flags</div><div class="sec-meta">Surfaced automatically — needs your attention</div></div></div>
+        <div class="flag-grid">
+          <div class="flag-card danger">
+            <div class="flag-top"><div class="flag-ico danger"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="flag-num danger">2</div></div>
+            <div class="flag-title">No contact in 4+ days</div>
+            <div class="flag-body">These leads came in and haven't been touched. First contact window is closing.</div>
+            <div class="flag-leads">
+              <div class="fl-row"><div><div class="fl-name">James T.</div><div class="fl-meta">Torres · 5d silent</div></div><span class="fl-tag hot">HOT</span></div>
+              <div class="fl-row"><div><div class="fl-name">Ray V.</div><div class="fl-meta">Williams · 4d silent</div></div><span class="fl-tag new">NEW</span></div>
+            </div>
+            <button class="flag-cta danger">Reassign Both →</button>
+          </div>
+          <div class="flag-card warn">
+            <div class="flag-top"><div class="flag-ico warn"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="flag-num warn">1</div></div>
+            <div class="flag-title">Agent with zero activity</div>
+            <div class="flag-body">Williams hasn't logged any activity today and has 19 open leads waiting.</div>
+            <div class="flag-leads">
+              <div class="fl-row"><div><div class="fl-name">Agent Williams</div><div class="fl-meta">19 leads · 0 touches today</div></div><span class="fl-tag inactive">INACTIVE</span></div>
+            </div>
+            <button class="flag-cta warn">Nudge Williams →</button>
+          </div>
+          <div class="flag-card info">
+            <div class="flag-top"><div class="flag-ico info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="flag-num info">3</div></div>
+            <div class="flag-title">Sequences stalled</div>
+            <div class="flag-body">These leads are mid-sequence but the next touch is overdue. Follow-up is at risk.</div>
+            <div class="flag-leads">
+              <div class="fl-row"><div><div class="fl-name">David H.</div><div class="fl-meta">Day 5 SMS · due today</div></div><span class="fl-tag seq">D5</span></div>
+              <div class="fl-row"><div><div class="fl-name">Linda P.</div><div class="fl-meta">Day 7 email · 1d overdue</div></div><span class="fl-tag late">D7</span></div>
+            </div>
+            <button class="flag-cta info">Review Sequences →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ AGENT DETAIL PAGE ══ -->
+    <div class="page" id="page-agents">
+      <div class="back-bar">
+        <button class="back-btn" onclick="showPage('dashboard')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Dashboard</button>
+        <div class="back-page-title">Agent Torres</div>
+      </div>
+      <div class="agent-hero">
+        <div class="hero-av" style="background:linear-gradient(135deg,var(--navy-500),var(--navy-400));">AT</div>
+        <div class="hero-info">
+          <div class="hero-name">Marcus Torres</div>
+          <div class="hero-role">Life Insurance Agent · ISG Financial · Hired Jan 2024</div>
+          <div class="hero-tags">
+            <span class="hero-tag">Veterans</span>
+            <span class="hero-tag">Truckers</span>
+            <span class="hero-tag">Whole Life</span>
+            <span class="hero-tag">IL Licensed</span>
+            <span class="hero-tag">WA Licensed</span>
+            <span class="hero-tag">VA Licensed</span>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div class="hs"><div class="hs-val">28</div><div class="hs-key">Leads</div></div>
+          <div style="width:1px;height:40px;background:var(--border-2);"></div>
+          <div class="hs"><div class="hs-val">34%</div><div class="hs-key">Contact Rate</div></div>
+          <div style="width:1px;height:40px;background:var(--border-2);"></div>
+          <div class="hs"><div class="hs-val">6</div><div class="hs-key">Issued MTD</div></div>
+          <div style="width:1px;height:40px;background:var(--border-2);"></div>
+          <div class="hs"><div class="hs-val">$8.4k</div><div class="hs-key">Commission</div></div>
+        </div>
+      </div>
+      <div class="agent-lead-table">
+        <div class="alt-hd"><div class="alt-title">Torres's Leads</div><div class="alt-meta">28 active · sorted by urgency</div></div>
+        <table class="pipe-table">
+          <thead><tr><th>Lead</th><th>Stage</th><th>State</th><th>Last Touch</th><th>Days Silent</th><th>Next Action</th></tr></thead>
+          <tbody>
+            <tr class="overdue">
+              <td><div class="lead-name">James T.</div><div class="lead-sub">Veteran · 58 · Whole Life · $100–200/mo</div></td>
+              <td><span class="sp sp-contacted">Contacted</span></td>
+              <td style="font-size:13px;font-weight:700;color:var(--text-1);">IL</td>
+              <td style="font-size:12px;color:var(--text-3);">Jun 9</td>
+              <td><div class="d-hot">5d<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div></td>
+              <td style="font-size:12px;color:var(--red-hi);font-weight:700;">Call now — overdue</td>
+            </tr>
+            <tr>
+              <td><div class="lead-name">Sarah M.</div><div class="lead-sub">Vet Spouse · 42 · Whole Life · $150–300/mo</div></td>
+              <td><span class="sp sp-quote">Quote Sent</span></td>
+              <td style="font-size:13px;font-weight:700;color:var(--text-1);">WA</td>
+              <td style="font-size:12px;color:var(--text-3);">Jun 12</td>
+              <td><div class="d-warn">2d</div></td>
+              <td style="font-size:12px;color:var(--amber);font-weight:600;">Follow-up call today</td>
+            </tr>
+            <tr>
+              <td><div class="lead-name">David H.</div><div class="lead-sub">Trucker · 51 · Whole Life · $120–250/mo</div></td>
+              <td><span class="sp sp-contacted">Contacted</span></td>
+              <td style="font-size:13px;font-weight:700;color:var(--text-1);">IL</td>
+              <td style="font-size:12px;color:var(--text-3);">Jun 9</td>
+              <td><div class="d-warn">Day 5</div></td>
+              <td style="font-size:12px;color:var(--gold-hi);font-weight:600;">SMS draft ready</td>
+            </tr>
+            <tr>
+              <td><div class="lead-name">Marcus R.</div><div class="lead-sub">Veteran · 34 · Whole Life · $80–150/mo</div></td>
+              <td><span class="sp sp-new">New</span></td>
+              <td style="font-size:13px;font-weight:700;color:var(--text-1);">IL</td>
+              <td style="font-size:12px;color:var(--text-3);">Jun 14</td>
+              <td><div class="d-ok">Today</div></td>
+              <td style="font-size:12px;color:var(--text-3);font-weight:500;">First contact</td>
+            </tr>
+            <tr>
+              <td><div class="lead-name">Diane W.</div><div class="lead-sub">Veteran · 55 · Whole Life · $200–350/mo</div></td>
+              <td><span class="sp sp-issued">Issued ✓</span></td>
+              <td style="font-size:13px;font-weight:700;color:var(--text-1);">IL</td>
+              <td style="font-size:12px;color:var(--text-3);">Jun 10</td>
+              <td><div class="d-ok">—</div></td>
+              <td style="font-size:12px;color:var(--green-hi);font-weight:600;">Policy issued · done</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ PERFORMANCE PAGE ══ -->
+    <div class="page" id="page-performance">
+      <div class="back-bar">
+        <button class="back-btn" onclick="showPage('dashboard')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Dashboard</button>
+        <div class="back-page-title">Team Performance</div>
+      </div>
+      <div class="perf-grid">
+        <!-- Policies Issued by Agent -->
+        <div class="perf-card">
+          <div class="perf-title">Policies Issued · June MTD</div>
+          <div class="perf-sub">Goal: 20 total across all agents</div>
+          <div class="bar-chart">
+            <div class="bar-row"><div class="bar-label">Torres</div><div class="bar-track"><div class="bar-fill gold" style="width:75%;">6</div></div><div class="bar-val">6</div></div>
+            <div class="bar-row"><div class="bar-label">Johnson</div><div class="bar-track"><div class="bar-fill gold" style="width:50%;">4</div></div><div class="bar-val">4</div></div>
+            <div class="bar-row"><div class="bar-label">Williams</div><div class="bar-track"><div class="bar-fill gold" style="width:37.5%;">3</div></div><div class="bar-val">3</div></div>
+            <div class="bar-row"><div class="bar-label">Martinez</div><div class="bar-track"><div class="bar-fill gold" style="width:25%;">2</div></div><div class="bar-val">2</div></div>
+            <div class="bar-row"><div class="bar-label">Davis</div><div class="bar-track"><div class="bar-fill gold" style="width:12.5%;">1</div></div><div class="bar-val">1</div></div>
+            <div class="bar-row"><div class="bar-label">Others (5)</div><div class="bar-track"><div class="bar-fill gold" style="width:25%;">2</div></div><div class="bar-val">2</div></div>
+          </div>
+        </div>
+
+        <!-- Contact Rate -->
+        <div class="perf-card">
+          <div class="perf-title">Contact Rate by Agent</div>
+          <div class="perf-sub">% of leads with at least one connection</div>
+          <div class="bar-chart">
+            <div class="bar-row"><div class="bar-label">Torres</div><div class="bar-track"><div class="bar-fill green" style="width:68%;">34%</div></div><div class="bar-val">34%</div></div>
+            <div class="bar-row"><div class="bar-label">Johnson</div><div class="bar-track"><div class="bar-fill green" style="width:58%;">29%</div></div><div class="bar-val">29%</div></div>
+            <div class="bar-row"><div class="bar-label">Martinez</div><div class="bar-track"><div class="bar-fill green" style="width:54%;">27%</div></div><div class="bar-val">27%</div></div>
+            <div class="bar-row"><div class="bar-label">Davis</div><div class="bar-track"><div class="bar-fill green" style="width:50%;">25%</div></div><div class="bar-val">25%</div></div>
+            <div class="bar-row"><div class="bar-label">Williams</div><div class="bar-track"><div class="bar-fill blue" style="width:48%;">24%</div></div><div class="bar-val">24%</div></div>
+          </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="perf-card full">
+          <div class="perf-title">Agent Leaderboard · June</div>
+          <div class="perf-sub">Ranked by policies issued · Commission shown</div>
+          <div class="leaderboard">
+            <div class="lb-row">
+              <div class="lb-rank gold">1</div>
+              <div class="lb-av" style="background:linear-gradient(135deg,var(--navy-500),var(--navy-400));">AT</div>
+              <div class="lb-info"><div class="lb-name">Agent Torres</div><div class="lb-states">IL · WA · VA · 28 active leads</div></div>
+              <div class="lb-stats">
+                <div class="lb-stat"><div class="lb-stat-val gold">6</div><div class="lb-stat-key">Issued</div></div>
+                <div class="lb-stat"><div class="lb-stat-val">34%</div><div class="lb-stat-key">Contact</div></div>
+                <div class="lb-stat"><div class="lb-stat-val gold">$8.4k</div><div class="lb-stat-key">Commission</div></div>
+              </div>
+            </div>
+            <div class="lb-row">
+              <div class="lb-rank two">2</div>
+              <div class="lb-av" style="background:linear-gradient(135deg,#0e2015,#1a3522);">AJ</div>
+              <div class="lb-info"><div class="lb-name">Agent Johnson</div><div class="lb-states">IL · OH · MI · 21 active leads</div></div>
+              <div class="lb-stats">
+                <div class="lb-stat"><div class="lb-stat-val">4</div><div class="lb-stat-key">Issued</div></div>
+                <div class="lb-stat"><div class="lb-stat-val">29%</div><div class="lb-stat-key">Contact</div></div>
+                <div class="lb-stat"><div class="lb-stat-val">$5.6k</div><div class="lb-stat-key">Commission</div></div>
+              </div>
+            </div>
+            <div class="lb-row">
+              <div class="lb-rank two">3</div>
+              <div class="lb-av" style="background:linear-gradient(135deg,#1e0e2a,#2d1840);">AW</div>
+              <div class="lb-info"><div class="lb-name">Agent Williams</div><div class="lb-states">CA · NJ · SC · 19 active leads</div></div>
+              <div class="lb-stats">
+                <div class="lb-stat"><div class="lb-stat-val">3</div><div class="lb-stat-key">Issued</div></div>
+                <div class="lb-stat"><div class="lb-stat-val">24%</div><div class="lb-stat-key">Contact</div></div>
+                <div class="lb-stat"><div class="lb-stat-val">$4.2k</div><div class="lb-stat-key">Commission</div></div>
+              </div>
+            </div>
+            <div class="lb-row">
+              <div class="lb-rank three">4</div>
+              <div class="lb-av" style="background:linear-gradient(135deg,#1a1208,#2e2010);">AM</div>
+              <div class="lb-info"><div class="lb-name">Agent Martinez</div><div class="lb-states">LA · AL · TX · 15 active leads</div></div>
+              <div class="lb-stats">
+                <div class="lb-stat"><div class="lb-stat-val">2</div><div class="lb-stat-key">Issued</div></div>
+                <div class="lb-stat"><div class="lb-stat-val">27%</div><div class="lb-stat-key">Contact</div></div>
+                <div class="lb-stat"><div class="lb-stat-val">$2.8k</div><div class="lb-stat-key">Commission</div></div>
+              </div>
+            </div>
+            <div class="lb-row">
+              <div class="lb-rank three">5</div>
+              <div class="lb-av" style="background:linear-gradient(135deg,#0a1a28,#102538);">AD</div>
+              <div class="lb-info"><div class="lb-name">Agent Davis</div><div class="lb-states">MI · SC · NJ · 12 active leads</div></div>
+              <div class="lb-stats">
+                <div class="lb-stat"><div class="lb-stat-val">1</div><div class="lb-stat-key">Issued</div></div>
+                <div class="lb-stat"><div class="lb-stat-val">25%</div><div class="lb-stat-key">Contact</div></div>
+                <div class="lb-stat"><div class="lb-stat-val">$1.4k</div><div class="lb-stat-key">Commission</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══ TOUR OVERLAY ══ -->
+<div class="tour-overlay" id="tour-overlay">
+  <!-- SVG backdrop with a transparent hole punched out over the target -->
+  <svg class="tour-svg-backdrop" id="tour-svg">
+    <defs>
+      <mask id="tour-mask">
+        <rect width="100%" height="100%" fill="white"/>
+        <rect id="tour-hole" rx="16" ry="16" fill="black"/>
+      </mask>
+    </defs>
+    <rect width="100%" height="100%" fill="rgba(5,8,16,0.80)" mask="url(#tour-mask)"/>
+  </svg>
+  <div class="tour-highlight" id="tour-highlight"></div>
+  <div class="tour-tooltip" id="tour-tooltip">
+    <div class="tt-step" id="tt-step"></div>
+    <div class="tt-title" id="tt-title"></div>
+    <div class="tt-body"  id="tt-body"></div>
+    <div class="tt-actions">
+      <div class="tt-dots" id="tt-dots"></div>
+      <div class="tt-btns">
+        <button class="tt-btn-skip" onclick="endTour()">Skip</button>
+        <button class="tt-btn-next" id="tt-next" onclick="nextTourStep()">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── PAGE NAVIGATION ── */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const sbEl = document.getElementById('sb-' + name);
+  if (sbEl) sbEl.classList.add('active');
+  document.querySelector('.main').scrollTop = 0;
+}
+
+/* ── TOUR ── */
+const tourSteps = [
+  {
+    target: 'tour-kpi',
+    title: 'Business at a Glance',
+    body: 'Your four most important numbers — updated in real time. Active leads, contact rate, policies issued, and commission. One look and you know if the business is healthy.',
+    placement: 'below'
+  },
+  {
+    target: 'tour-pipeline',
+    title: 'Live Pipeline',
+    body: 'Every lead across all 10 agents, sorted by urgency. Overdue rows light up red. Click any agent name to drill into their full lead list. Nudge or reassign in one click.',
+    placement: 'above'
+  },
+  {
+    target: 'tour-team',
+    title: 'Team Activity',
+    body: "See who's working right now. Green dot = active today. Williams's 0 touches is flagged red. Click any agent to see their full lead list and stats.",
+    placement: 'left'
+  },
+  {
+    target: 'tour-flags',
+    title: 'Red Flags',
+    body: "The system surfaces problems automatically so you don't have to go hunting. Leads going cold, agents going quiet, sequences stalling — all here with a one-click action on each.",
+    placement: 'above'
+  }
+];
+
+let currentStep = 0;
+const mainEl = () => document.querySelector('.main');
+
+function preventDefault(e) { e.preventDefault(); e.stopPropagation(); }
+
+function lockScroll() {
+  const m = mainEl();
+  // Lock the scrollable main panel
+  m.style.overflow = 'hidden';
+  // Lock the document body too in case of any overflow
+  document.body.style.overflow = 'hidden';
+  // Block all scroll events everywhere
+  window.addEventListener('wheel',     preventDefault, { passive: false });
+  window.addEventListener('touchmove', preventDefault, { passive: false });
+  document.addEventListener('keydown',  blockScrollKeys, false);
+}
+
+function unlockScroll() {
+  const m = mainEl();
+  m.style.overflow = '';
+  document.body.style.overflow = '';
+  window.removeEventListener('wheel',     preventDefault);
+  window.removeEventListener('touchmove', preventDefault);
+  document.removeEventListener('keydown',  blockScrollKeys);
+}
+
+function blockScrollKeys(e) {
+  // Block arrow keys, space, page up/down, home/end while tour is active
+  const scrollKeys = [32, 33, 34, 35, 36, 37, 38, 39, 40];
+  // But still allow Enter and right arrow for tour navigation
+  if (e.keyCode === 13 || e.keyCode === 39) return; // Enter, right arrow
+  if (scrollKeys.includes(e.keyCode)) { e.preventDefault(); }
+}
+
+function startTour() {
+  currentStep = 0;
+  document.getElementById('tour-overlay').classList.add('active');
+  // Make sure scroll is UNlocked before we try to scroll anywhere
+  unlockScroll();
+  // Snap to top instantly for step 1, then lock and place
+  mainEl().scrollTo({ top: 0, behavior: 'instant' });
+  setTimeout(() => {
+    lockScroll();
+    placeElements(0);
+  }, 60);
+}
+
+function endTour() {
+  unlockScroll();
+  document.getElementById('tour-overlay').classList.remove('active');
+}
+
+function nextTourStep() {
+  currentStep++;
+  if (currentStep >= tourSteps.length) { endTour(); return; }
+  runStep(currentStep);
+}
+
+function runStep(i) {
+  const m      = mainEl();
+  const layout = document.querySelector('.layout');
+
+  // 1. Unlock everything — .main AND .layout (which has overflow:hidden in CSS)
+  m.style.overflow      = 'auto';
+  layout.style.overflow = 'visible';
+  document.body.style.overflow = '';
+  window.removeEventListener('wheel',     preventDefault);
+  window.removeEventListener('touchmove', preventDefault);
+  document.removeEventListener('keydown',  blockScrollKeys);
+
+  // 2. Give browser one frame to apply overflow changes before reading scrollHeight
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      let desiredScroll;
+
+      if (i === tourSteps.length - 1) {
+        desiredScroll = m.scrollHeight - m.clientHeight;
+      } else {
+        const target       = document.getElementById(tourSteps[i].target);
+        const mainRect     = m.getBoundingClientRect();
+        const targetRect   = target.getBoundingClientRect();
+        const targetRelTop = targetRect.top - mainRect.top + m.scrollTop;
+        desiredScroll = Math.max(0, targetRelTop - 90);
+      }
+
+      m.scrollTo({ top: desiredScroll, behavior: 'smooth' });
+
+      // 3. After scroll lands, restore layout overflow and re-lock
+      setTimeout(() => {
+        layout.style.overflow = '';
+        lockScroll();
+        placeElements(i);
+      }, 650);
+    });
+  });
+}
+
+function placeElements(i) {
+  const step   = tourSteps[i];
+  const target = document.getElementById(step.target);
+  const rect   = target.getBoundingClientRect();
+  const pad    = 10;
+  const vw     = window.innerWidth;
+  const vh     = window.innerHeight;
+
+  const hx = rect.left   - pad;
+  const hy = rect.top    - pad;
+  const hw = rect.width  + pad * 2;
+  const hh = rect.height + pad * 2;
+
+  // SVG hole — transparent window punched through the dark mask
+  const hole = document.getElementById('tour-hole');
+  hole.setAttribute('x',      hx);
+  hole.setAttribute('y',      hy);
+  hole.setAttribute('width',  hw);
+  hole.setAttribute('height', hh);
+
+  // Gold ring
+  const hl = document.getElementById('tour-highlight');
+  hl.style.left   = hx + 'px';
+  hl.style.top    = hy + 'px';
+  hl.style.width  = hw + 'px';
+  hl.style.height = hh + 'px';
+
+  // Tooltip placement
+  const ttW = 300, ttH = 220, margin = 18;
+  let left, top;
+
+  if (step.placement === 'below') {
+    left = hx + hw / 2 - ttW / 2;
+    top  = hy + hh + margin;
+  } else if (step.placement === 'above') {
+    left = hx + hw / 2 - ttW / 2;
+    top  = hy - ttH - margin;
+  } else if (step.placement === 'left') {
+    left = hx - ttW - margin;
+    top  = hy + hh / 2 - ttH / 2;
+  } else {
+    left = hx + hw + margin;
+    top  = hy + hh / 2 - ttH / 2;
+  }
+
+  left = Math.max(margin, Math.min(left, vw - ttW - margin));
+  top  = Math.max(margin, Math.min(top,  vh - ttH - margin));
+
+  const tt = document.getElementById('tour-tooltip');
+  tt.style.left = left + 'px';
+  tt.style.top  = top  + 'px';
+
+  document.getElementById('tt-step').textContent  = `Step ${i + 1} of ${tourSteps.length}`;
+  document.getElementById('tt-title').textContent = step.title;
+  document.getElementById('tt-body').textContent  = step.body;
+  document.getElementById('tt-next').textContent  = i === tourSteps.length - 1 ? 'Done ✓' : 'Next →';
+
+  const dots = document.getElementById('tt-dots');
+  dots.innerHTML = tourSteps.map((_, j) =>
+    `<div class="tt-dot${j === i ? ' active' : ''}"></div>`
+  ).join('');
+}
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('tour-overlay').classList.contains('active')) return;
+  if (e.key === 'Escape') endTour();
+  if (e.key === 'ArrowRight' || e.key === 'Enter') nextTourStep();
+});
+</script>
+</body>
+</html>

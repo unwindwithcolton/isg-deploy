@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISG Financial · Agent Intelligence Platform</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Navy-based palette */
+  --bg:         #070c1a;
+  --bg2:        #0a1020;
+  --surface:    #0d1528;
+  --card:       #111c35;
+  --card-up:    #182240;
+  --border:     rgba(255,255,255,0.07);
+  --border2:    rgba(255,255,255,0.12);
+  --text:       #eef1f8;
+  --muted:      #6b7a99;
+  --dim:        #3d4f6e;
+  --gold:       #e8a838;
+  --gold-dim:   rgba(232,168,56,0.10);
+  --gold-mid:   rgba(232,168,56,0.20);
+  --red:        #e84040;
+  --red-dim:    rgba(232,64,64,0.10);
+  --green:      #18b87a;
+  --green-dim:  rgba(24,184,122,0.10);
+  --amber:      #f09c20;
+  --blue:       #4a8cf7;
+  --blue-dim:   rgba(74,140,247,0.10);
+  --purple:     #a78bfa;
+  --purple-dim: rgba(167,139,250,0.12);
+  --navy-glow:  rgba(30,60,140,0.35);
+}
+
+html, body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════
+   SLIDE ENGINE
+═══════════════════════════════════════ */
+#deck { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.5s ease;
+  padding: 60px 40px;
+}
+.slide.active { opacity: 1; pointer-events: all; }
+.slide:not(#slide-demo) { cursor: pointer; }
+
+/* Ambient background — no flicker, smooth & still */
+.slide-bg {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+}
+.slide-bg-inner {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 38%, rgba(30,60,140,0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 20% 80%, rgba(232,168,56,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 25% at 80% 75%, rgba(30,60,140,0.10) 0%, transparent 60%);
+  /* single gentle scale — no opacity pulse, no flicker */
+  animation: bg-breathe 12s ease-in-out infinite alternate;
+}
+@keyframes bg-breathe {
+  0%   { transform: scale(1);    }
+  100% { transform: scale(1.04); }
+}
+.slide > * { position: relative; z-index: 1; }
+
+/* Progress dots */
+#progress {
+  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 100; transition: opacity 0.4s;
+}
+.pdot { width: 6px; height: 6px; border-radius: 50%; background: var(--dim); transition: all 0.3s; }
+.pdot.active { background: var(--gold); width: 20px; border-radius: 3px; }
+#progress.hidden { opacity: 0; pointer-events: none; }
+
+#skip-btn {
+  position: fixed; top: 28px; right: 32px; z-index: 100;
+  font-size: 12px; font-weight: 600; color: var(--muted);
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 8px 16px; cursor: pointer;
+  transition: opacity 0.4s, color 0.2s; font-family: 'Inter', sans-serif;
+}
+#skip-btn:hover { color: var(--text); }
+#skip-btn.hidden { opacity: 0; pointer-events: none; }
+
+#back-btn {
+  position: fixed; top: 28px; left: 32px; z-index: 100;
+  font-size: 12px; font-weight: 600; color: var(--muted);
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 8px 16px; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: opacity 0.4s, color 0.2s; font-family: 'Inter', sans-serif;
+  opacity: 0; pointer-events: none;
+}
+#back-btn:hover { color: var(--text); }
+#back-btn.visible { opacity: 1; pointer-events: all; }
+
+.click-hint {
+  position: absolute; bottom: 72px;
+  font-size: 11px; color: var(--dim); font-weight: 500;
+  display: flex; align-items: center; gap: 6px;
+  opacity: 0.6;
+}
+.click-hint svg { width: 14px; height: 14px; stroke: var(--dim); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ═══════════════════════════════════════
+   SLIDE 1 — COVER
+═══════════════════════════════════════ */
+.cover-eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
+}
+.cover-eyebrow::before, .cover-eyebrow::after {
+  content:''; flex:1; max-width:60px; height:1px; background:var(--gold); opacity:0.3;
+}
+.cover-logo { font-size: 56px; font-weight: 900; letter-spacing: -2px; color: var(--text); line-height: 1; margin-bottom: 6px; text-align: center; }
+.cover-logo span { color: var(--gold); }
+.cover-sub { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 44px; letter-spacing: 0.1em; text-transform: uppercase; }
+.cover-tagline { font-size: clamp(28px, 3.8vw, 48px); font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; text-align: center; max-width: 680px; }
+.cover-tagline em { font-style: normal; color: var(--gold); }
+.cover-rule { width: 60px; height: 2px; background: var(--gold); opacity: 0.4; margin: 36px auto; }
+.cover-stats { display: flex; gap: 48px; align-items: center; }
+.cs-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.cs-num { font-size: 32px; font-weight: 900; letter-spacing: -1px; color: var(--gold); }
+.cs-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; }
+.cs-div { width: 1px; height: 40px; background: var(--border2); }
+
+/* ═══════════════════════════════════════
+   SLIDE 2 — PROBLEM
+═══════════════════════════════════════ */
+.slide-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+.slide-h1 { font-size: clamp(30px, 4vw, 50px); font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; text-align: center; max-width: 820px; margin-bottom: 48px; }
+.slide-h1 em { font-style: normal; color: var(--red); }
+.slide-h1 em.gold { font-style: normal; color: var(--gold); }
+
+.problem-grid { display: flex; gap: 20px; max-width: 940px; width: 100%; }
+.prob-card { flex: 1; background: var(--card); border: 1px solid var(--border2); border-radius: 20px; padding: 26px 22px; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; }
+.prob-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--red); opacity:0.5; }
+.prob-num { font-size: 38px; font-weight: 900; color: var(--red); opacity: 0.2; letter-spacing: -2px; line-height: 1; }
+.prob-title { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+.prob-body { font-size: 13px; color: var(--muted); line-height: 1.65; }
+.prob-body strong { color: var(--text); font-weight: 600; }
+
+/* ═══════════════════════════════════════
+   SLIDE 3 — SOLUTION
+═══════════════════════════════════════ */
+.solution-grid { display: flex; gap: 18px; max-width: 960px; width: 100%; }
+.sol-card { flex: 1; background: var(--card); border: 1px solid var(--border2); border-radius: 20px; padding: 26px 20px; display: flex; flex-direction: column; gap: 12px; position: relative; overflow: hidden; }
+.sol-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.sol-card.gold-top::before   { background: var(--gold); }
+.sol-card.purple-top::before { background: var(--purple); opacity:0.7; }
+.sol-card.green-top::before  { background: var(--green); opacity:0.8; }
+.sol-card.blue-top::before   { background: var(--blue); opacity:0.7; }
+.sol-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.sol-icon svg { width: 20px; height: 20px; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.sol-icon.gold   { background: var(--gold-dim); }    .sol-icon.gold svg   { stroke: var(--gold); }
+.sol-icon.purple { background: var(--purple-dim); }  .sol-icon.purple svg { stroke: var(--purple); }
+.sol-icon.green  { background: var(--green-dim); }   .sol-icon.green svg  { stroke: var(--green); }
+.sol-icon.blue   { background: var(--blue-dim); }    .sol-icon.blue svg   { stroke: var(--blue); }
+.sol-title { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+.sol-body  { font-size: 12px; color: var(--muted); line-height: 1.65; }
+.sol-body strong { color: var(--text); font-weight: 600; }
+
+/* ═══════════════════════════════════════
+   SLIDE 4 — HOW IT WORKS
+═══════════════════════════════════════ */
+.flow { display: flex; align-items: center; gap: 0; max-width: 920px; width: 100%; }
+.flow-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.flow-num { width: 48px; height: 48px; border-radius: 50%; background: var(--card-up); border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: var(--gold); }
+.flow-title { font-size: 14px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+.flow-body  { font-size: 11px; color: var(--muted); line-height: 1.6; max-width: 150px; }
+.flow-arrow { color: var(--dim); font-size: 22px; padding: 0 6px; margin-bottom: 38px; flex-shrink: 0; }
+.time-strip { display: flex; gap: 14px; max-width: 920px; width: 100%; margin-top: 36px; }
+.time-pill { flex: 1; background: var(--card); border: 1px solid var(--border2); border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; gap: 12px; }
+.time-val   { font-size: 22px; font-weight: 900; color: var(--gold); letter-spacing: -0.5px; flex-shrink: 0; }
+.time-label { font-size: 11px; color: var(--muted); line-height: 1.45; }
+.time-label strong { display: block; font-size: 12px; color: var(--text); font-weight: 700; margin-bottom: 2px; }
+
+/* ═══════════════════════════════════════
+   SLIDE 5 — ENTER DEMO
+═══════════════════════════════════════ */
+.enter-label { font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 24px; }
+.enter-h1 { font-size: clamp(36px, 5vw, 64px); font-weight: 900; letter-spacing: -2px; line-height: 1.05; text-align: center; max-width: 680px; margin-bottom: 48px; }
+.enter-h1 em { font-style: normal; color: var(--gold); }
+.enter-btn { display: flex; align-items: center; gap: 12px; background: var(--gold); color: #070c1a; border: none; border-radius: 18px; padding: 18px 36px; font-size: 16px; font-weight: 800; font-family: 'Inter', sans-serif; cursor: pointer; letter-spacing: -0.3px; }
+.enter-btn svg { width: 18px; height: 18px; stroke: #070c1a; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ═══════════════════════════════════════
+   DEMO SLIDE + PHONE
+═══════════════════════════════════════ */
+#slide-demo { background: #050810; padding: 0; justify-content: center; align-items: center; cursor: default; }
+
+.phone-shell {
+  width: 375px; height: 760px;
+  background: var(--bg);
+  border-radius: 50px;
+  border: 1.5px solid rgba(255,255,255,0.09);
+  box-shadow: 0 0 0 8px #040710, 0 0 0 10px rgba(255,255,255,0.04), 0 40px 80px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.06);
+  overflow: hidden; position: relative; display: flex; flex-direction: column; flex-shrink: 0;
+}
+
+.status-bar { display: flex; justify-content: space-between; align-items: center; padding: 14px 28px 0; flex-shrink: 0; }
+.status-time { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+.status-icons { display: flex; gap: 6px; align-items: center; }
+.signal-bar { width: 3px; background: var(--text); border-radius: 1px; opacity: 0.8; }
+.dynamic-island { width: 120px; height: 34px; background: #000; border-radius: 20px; margin: 8px auto 0; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); }
+
+.app-screen { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+.app-screen.active { display: flex; }
+
+.bottom-nav { display: flex; justify-content: space-around; align-items: flex-start; padding: 10px 20px 24px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+.nav-icon-wrap { width: 42px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 10px; transition: background 0.2s; }
+.nav-icon-wrap.active { background: var(--gold-dim); }
+.nav-icon-wrap svg { width: 20px; height: 20px; stroke: var(--dim); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s; }
+.nav-icon-wrap.active svg { stroke: var(--gold); }
+.nav-label { font-size: 10px; font-weight: 500; color: var(--dim); transition: color 0.2s; }
+.nav-label.active { color: var(--gold); font-weight: 600; }
+
+.h-rule { height: 1px; background: var(--border); margin: 0 20px; flex-shrink: 0; }
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 10px; flex-shrink: 0; }
+.topbar-greeting { font-size: 12px; color: var(--muted); }
+.topbar-name { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; line-height: 1; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.notif-bubble { width: 36px; height: 36px; background: var(--card-up); border: 1px solid var(--border2); border-radius: 12px; display: flex; align-items: center; justify-content: center; position: relative; }
+.notif-bubble svg { width: 16px; height: 16px; stroke: var(--muted); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: var(--red); border-radius: 50%; border: 1.5px solid var(--bg); }
+.avatar { width: 36px; height: 36px; background: linear-gradient(135deg,#0f1e3a,#1a2e55); border: 1px solid var(--border2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--gold); }
+
+.badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 3px 7px; border-radius: 5px; }
+.badge-hot   { color: var(--red);    background: var(--red-dim);        border: 1px solid rgba(232,64,64,0.2); }
+.badge-warm  { color: var(--amber);  background: rgba(240,156,32,0.10); border: 1px solid rgba(240,156,32,0.2); }
+.badge-type  { color: var(--gold);   background: var(--gold-dim);       border: 1px solid rgba(232,168,56,0.2); }
+.badge-seq   { color: var(--purple); background: var(--purple-dim);     border: 1px solid rgba(167,139,250,0.2); }
+.badge-green { color: var(--green);  background: var(--green-dim);      border: 1px solid rgba(24,184,122,0.2); }
+.source-tag  { font-size: 9px; color: var(--dim); font-weight: 500; }
+
+/* PULSE SCREEN */
+.pulse-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 10px; flex-shrink: 0; }
+.pulse-eyebrow { display: flex; align-items: center; gap: 7px; }
+.pulse-live-dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: live-pulse 1.8s ease-in-out infinite; }
+@keyframes live-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+.pulse-label-text { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.pulse-count { font-size: 11px; font-weight: 600; color: var(--dim); }
+.carousel-viewport { flex: 1; overflow: hidden; position: relative; padding: 0 16px; }
+.carousel-track { display: flex; gap: 12px; height: 100%; align-items: flex-start; animation: carousel-slide 18s cubic-bezier(0.76,0,0.24,1) infinite; will-change: transform; }
+@keyframes carousel-slide {
+  0%   { transform: translateX(0); }
+  30%  { transform: translateX(0); }
+  36%  { transform: translateX(calc(-1 * (343px + 12px))); }
+  63%  { transform: translateX(calc(-1 * (343px + 12px))); }
+  69%  { transform: translateX(calc(-2 * (343px + 12px))); }
+  96%  { transform: translateX(calc(-2 * (343px + 12px))); }
+  100% { transform: translateX(0); }
+}
+.slide-c { min-width: 343px; display: flex; flex-direction: column; }
+.lead-card { background: var(--card); border-radius: 20px; border: 1px solid var(--border2); overflow: hidden; position: relative; width: 100%; }
+.lead-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; animation: breathe 2.4s ease-in-out infinite; }
+.card-hot::before  { background: var(--red); }
+.card-warm::before { background: var(--amber); }
+@keyframes breathe { 0%,100%{opacity:1} 50%{opacity:0.45} }
+.card-inner { padding: 16px 16px 14px 20px; }
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.card-top-left { display: flex; flex-direction: column; gap: 5px; }
+.lead-type-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.lead-name-big { font-size: 24px; font-weight: 900; color: var(--text); letter-spacing: -0.8px; line-height: 1; }
+.lead-age { font-size: 13px; font-weight: 400; color: var(--muted); }
+.score-block { display: flex; flex-direction: column; align-items: center; gap: 0; min-width: 52px; }
+.score-ring { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+.score-ring.hot  { background: conic-gradient(var(--red)   0deg, var(--red)   313deg, rgba(232,64,64,0.12)  313deg); }
+.score-ring.warm { background: conic-gradient(var(--amber) 0deg, var(--amber) 256deg, rgba(240,156,32,0.12) 256deg); }
+.score-ring::after { content:''; position:absolute; width:38px; height:38px; background:var(--card); border-radius:50%; }
+.score-number { font-size: 18px; font-weight: 900; letter-spacing: -1px; position: relative; z-index: 1; line-height: 1; }
+.score-number.hot  { color: var(--red); }
+.score-number.warm { color: var(--amber); }
+.score-word { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--dim); margin-top: 4px; }
+.card-divider { height: 1px; background: var(--border); margin: 0 -16px 0 -20px; }
+.reason-section { padding: 10px 0 8px; }
+.reason-eyebrow { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--dim); margin-bottom: 5px; }
+.reason-text { font-size: 13px; color: var(--muted); line-height: 1.55; }
+.reason-text strong { color: var(--text); font-weight: 600; }
+.meta-strip { display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 10px 0 12px; border-top: 1px solid var(--border); }
+.meta-cell { display: flex; flex-direction: column; gap: 3px; padding-right: 12px; }
+.meta-cell:not(:last-child) { border-right: 1px solid var(--border); margin-right: 12px; }
+.meta-key { font-size: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--dim); }
+.meta-val { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; }
+.licensed-check { color: var(--green); }
+.action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 16px 16px 20px; }
+.btn-call { background: var(--green); color: #fff; border: none; border-radius: 14px; padding: 15px 0; font-size: 14px; font-weight: 700; font-family: 'Inter',sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-call svg { width: 14px; height: 14px; stroke: white; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-msg { background: var(--card-up); color: var(--text); border: 1px solid var(--border2); border-radius: 14px; padding: 15px 0; font-size: 14px; font-weight: 600; font-family: 'Inter',sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-msg svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-followup { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(167,139,250,0.25); border-radius: 14px; padding: 14px 0; font-size: 14px; font-weight: 700; font-family: 'Inter',sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-followup svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.dots { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 10px 0 8px; flex-shrink: 0; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dim); }
+.dot:nth-child(1) { animation: dot-1 18s ease-in-out infinite; }
+.dot:nth-child(2) { animation: dot-2 18s ease-in-out infinite; }
+.dot:nth-child(3) { animation: dot-3 18s ease-in-out infinite; }
+@keyframes dot-1 { 0%,30%{background:var(--gold);width:18px;border-radius:3px;} 36%,100%{background:var(--dim);width:6px;border-radius:50%;} }
+@keyframes dot-2 { 0%,35%{background:var(--dim);width:6px;border-radius:50%;} 36%,63%{background:var(--gold);width:18px;border-radius:3px;} 69%,100%{background:var(--dim);width:6px;border-radius:50%;} }
+@keyframes dot-3 { 0%,68%{background:var(--dim);width:6px;border-radius:50%;} 69%,96%{background:var(--gold);width:18px;border-radius:3px;} 100%{background:var(--dim);width:6px;border-radius:50%;} }
+
+/* LEADS SCREEN */
+.sheet-body { flex: 1; overflow-y: auto; padding: 0 20px; }
+.sheet-body::-webkit-scrollbar { display: none; }
+.sheet-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 12px; flex-shrink: 0; }
+.sheet-back { display: flex; align-items: center; gap: 6px; }
+.sheet-back svg { width: 18px; height: 18px; stroke: var(--muted); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.sheet-back-text { font-size: 13px; font-weight: 600; color: var(--muted); }
+.sheet-title { font-size: 14px; font-weight: 800; color: var(--text); }
+.sheet-more { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+.sheet-more svg { width: 18px; height: 18px; stroke: var(--muted); fill: none; stroke-width: 2; }
+.lead-hero { padding: 14px 0 12px; border-bottom: 1px solid var(--border); }
+.lh-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.lh-badges { display: flex; align-items: center; gap: 5px; margin-bottom: 7px; flex-wrap: wrap; }
+.lh-name { font-size: 26px; font-weight: 900; color: var(--text); letter-spacing: -1px; line-height: 1; }
+.lh-name span { font-size: 15px; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+.lh-meta { display: grid; grid-template-columns: 1fr 1fr 1fr; padding-top: 10px; }
+.lh-meta .meta-cell { display: flex; flex-direction: column; gap: 3px; padding-right: 12px; }
+.lh-meta .meta-cell:not(:last-child) { border-right: 1px solid var(--border); margin-right: 12px; }
+.score-ring-sm { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+.score-ring-sm.warm { background: conic-gradient(var(--amber) 0deg, var(--amber) 284deg, rgba(240,156,32,0.12) 284deg); }
+.score-ring-sm::after { content:''; position:absolute; width:37px; height:37px; background:var(--card); border-radius:50%; }
+.no-reply { color: var(--amber); }
+.section-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--dim); margin: 14px 0 10px; display: flex; justify-content: space-between; align-items: center; }
+.section-label .adv-hint { color: var(--amber); font-size: 9px; font-weight: 600; text-transform: none; letter-spacing: 0; }
+.stage-track { display: flex; align-items: center; gap: 0; margin-bottom: 14px; }
+.st-step { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 0 0 auto; }
+.st-bubble { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; }
+.st-bubble.done { background: var(--green-dim); border: 1.5px solid var(--green); color: var(--green); }
+.st-bubble.now  { background: rgba(240,156,32,0.15); border: 1.5px solid var(--amber); color: var(--amber); animation: now-glow 2s ease-in-out infinite; }
+.st-bubble.next { background: var(--card-up); border: 1.5px solid var(--border2); color: var(--dim); }
+@keyframes now-glow { 0%,100%{box-shadow:0 0 0 4px rgba(240,156,32,0.08);} 50%{box-shadow:0 0 0 8px rgba(240,156,32,0.04);} }
+.st-label { font-size: 7px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+.st-label.done { color: var(--green); } .st-label.now { color: var(--amber); } .st-label.next { color: var(--dim); }
+.st-line { flex: 1; height: 1.5px; margin-bottom: 16px; }
+.st-line.done { background: var(--green); opacity: 0.5; } .st-line.next { background: var(--border2); }
+.advance-btn { width: 100%; background: linear-gradient(135deg,rgba(240,156,32,0.15),rgba(240,156,32,0.08)); border: 1px solid rgba(240,156,32,0.35); border-radius: 14px; padding: 13px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin-bottom: 14px; }
+.adv-left { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+.adv-eyebrow { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--amber); opacity: 0.7; }
+.adv-action { font-size: 13px; font-weight: 800; color: var(--amber); letter-spacing: -0.3px; }
+.adv-arrow svg { width: 18px; height: 18px; stroke: var(--amber); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.ai-brief-head { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.ai-spark svg { width: 12px; height: 12px; fill: var(--purple); }
+.ai-brief-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--purple); }
+.ai-brief-card { background: var(--card); border: 1px solid var(--border2); border-radius: 14px; padding: 12px 14px; margin-bottom: 14px; }
+.ai-brief-text { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.ai-brief-text strong { color: var(--text); font-weight: 600; }
+.activity { display: flex; flex-direction: column; margin-bottom: 14px; }
+.act-row { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.act-row:last-child { border-bottom: none; }
+.act-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+.act-dot.green { background: var(--green); } .act-dot.amber { background: var(--amber); } .act-dot.dim { background: var(--dim); }
+.act-body { flex: 1; }
+.act-title { font-size: 11px; font-weight: 600; color: var(--text); }
+.act-sub   { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.act-time  { font-size: 10px; color: var(--dim); font-weight: 500; flex-shrink: 0; padding-top: 1px; }
+.action-footer { flex-shrink: 0; padding: 12px 20px 20px; border-top: 1px solid var(--border); background: var(--bg); display: flex; flex-direction: column; gap: 8px; }
+.btn-call-full { width: 100%; background: var(--green); color: #fff; border: none; border-radius: 14px; padding: 14px 0; font-size: 14px; font-weight: 700; font-family: 'Inter',sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-call-full svg { width: 14px; height: 14px; stroke: #fff; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.secondary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.btn-ghost { background: var(--card-up); color: var(--text); border: 1px solid var(--border2); border-radius: 12px; padding: 12px 0; font-size: 12px; font-weight: 600; font-family: 'Inter',sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.btn-ghost svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* PIPELINE PLACEHOLDER */
+.coming-soon { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 40px; }
+.cs-icon { width: 56px; height: 56px; background: var(--card-up); border: 1px solid var(--border2); border-radius: 18px; display: flex; align-items: center; justify-content: center; }
+.cs-icon svg { width: 26px; height: 26px; stroke: var(--gold); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.cs-title { font-size: 20px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; text-align: center; }
+.cs-body  { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.6; max-width: 260px; }
+.cs-pill  { background: var(--gold-dim); border: 1px solid rgba(232,168,56,0.25); border-radius: 10px; padding: 8px 16px; font-size: 11px; font-weight: 700; color: var(--gold); letter-spacing: 0.05em; }
+
+/* PROFILE SCREEN */
+.profile-body { flex: 1; overflow-y: auto; padding: 0 20px; }
+.profile-body::-webkit-scrollbar { display: none; }
+.profile-hero { padding: 16px 0; display: flex; flex-direction: column; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+.profile-avatar { width: 64px; height: 64px; background: linear-gradient(135deg,#0f1e3a,#1a2e55); border: 1.5px solid var(--border2); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: var(--gold); }
+.profile-name { font-size: 20px; font-weight: 900; color: var(--text); letter-spacing: -0.6px; }
+.profile-role { font-size: 12px; color: var(--muted); font-weight: 500; }
+.profile-tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.profile-tag { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 6px; background: var(--gold-dim); border: 1px solid rgba(232,168,56,0.2); color: var(--gold); }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+.stat-card { background: var(--card); border: 1px solid var(--border2); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 4px; }
+.stat-val { font-size: 26px; font-weight: 900; letter-spacing: -1px; }
+.stat-val.gold   { color: var(--gold); }   .stat-val.green { color: var(--green); }
+.stat-val.amber  { color: var(--amber); }  .stat-val.purple{ color: var(--purple); }
+.stat-key { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--dim); }
+.stat-delta { font-size: 10px; font-weight: 600; color: var(--green); }
+.license-row { background: var(--card); border: 1px solid var(--border2); border-radius: 14px; padding: 11px 13px; display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+.lic-icon { width: 30px; height: 30px; background: var(--green-dim); border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.lic-icon svg { width: 15px; height: 15px; stroke: var(--green); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.lic-text { flex: 1; }
+.lic-title { font-size: 12px; font-weight: 700; color: var(--text); }
+.lic-sub   { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.lic-check { font-size: 12px; font-weight: 700; color: var(--green); }
+.team-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.team-row:last-child { border-bottom: none; }
+.team-av { width: 34px; height: 34px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--gold); border: 1px solid var(--border2); flex-shrink: 0; }
+.team-info { flex: 1; }
+.team-name { font-size: 12px; font-weight: 700; color: var(--text); }
+.team-stat { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.team-score { font-size: 12px; font-weight: 800; color: var(--amber); }
+.scroll-pad { height: 16px; }
+</style>
+</head>
+<body>
+<div id="deck">
+
+  <div id="progress">
+    <div class="pdot active"></div>
+    <div class="pdot"></div>
+    <div class="pdot"></div>
+    <div class="pdot"></div>
+    <div class="pdot"></div>
+  </div>
+  <button id="skip-btn" onclick="goDemo()">Jump to demo →</button>
+  <button id="back-btn" onclick="goBack()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to deck
+  </button>
+
+  <!-- SLIDE 1 — COVER -->
+  <div class="slide active" id="slide-1" onclick="nextSlide()">
+    <div class="slide-bg"><div class="slide-bg-inner"></div></div>
+    <div class="cover-eyebrow">Agent Intelligence Platform</div>
+    <div class="cover-logo">ISG<span>.</span></div>
+    <div class="cover-sub">ISG Financial · Powered by AI</div>
+    <div class="cover-tagline">Your agents are leaving money<br>on the table. <em>Every single day.</em></div>
+    <div class="cover-rule"></div>
+    <div class="cover-stats">
+      <div class="cs-item"><div class="cs-num">10</div><div class="cs-label">Agents</div></div>
+      <div class="cs-div"></div>
+      <div class="cs-item"><div class="cs-num">2–3</div><div class="cs-label">Follow-up attempts</div></div>
+      <div class="cs-div"></div>
+      <div class="cs-item"><div class="cs-num">0</div><div class="cs-label">Pipeline visibility</div></div>
+    </div>
+    <div class="click-hint"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>Click to continue</div>
+  </div>
+
+  <!-- SLIDE 2 — PROBLEM -->
+  <div class="slide" id="slide-2" onclick="nextSlide()">
+    <div class="slide-bg"><div class="slide-bg-inner"></div></div>
+    <div class="slide-eyebrow">The Problem</div>
+    <div class="slide-h1">Good leads. No system.<br><em>Follow-up dies after 2 calls.</em></div>
+    <div class="problem-grid">
+      <div class="prob-card">
+        <div class="prob-num">01</div>
+        <div class="prob-title">Follow-up falls off</div>
+        <div class="prob-body">Agents make 2–3 attempts and move on. <strong>Most sales happen at touch 5–8.</strong> Without a sequence engine, those leads just die in a spreadsheet.</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-num">02</div>
+        <div class="prob-title">No manager visibility</div>
+        <div class="prob-body">You're running 10 agents off a spreadsheet with <strong>zero pipeline visibility.</strong> No way to see who's working, who's stalling, or where deals are dying.</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-num">03</div>
+        <div class="prob-title">New agents need hand-holding</div>
+        <div class="prob-body">New agents don't know <strong>who to call, what to say, or when.</strong> Without qualified direction, they burn through good leads and lose confidence fast.</div>
+      </div>
+    </div>
+    <div class="click-hint"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>Click to continue</div>
+  </div>
+
+  <!-- SLIDE 3 — SOLUTION -->
+  <div class="slide" id="slide-3" onclick="nextSlide()">
+    <div class="slide-bg"><div class="slide-bg-inner"></div></div>
+    <div class="slide-eyebrow">The Solution</div>
+    <div class="slide-h1">One app. One screen.<br><em class="gold">One thing to do next.</em></div>
+    <div class="solution-grid">
+      <div class="sol-card gold-top">
+        <div class="sol-icon gold"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></div>
+        <div class="sol-title">The Pulse</div>
+        <div class="sol-body">Every morning, each agent sees <strong>the one lead to act on right now.</strong> AI-scored from your Meta leads, ranked by intent. No guesswork — even for brand new agents.</div>
+      </div>
+      <div class="sol-card purple-top">
+        <div class="sol-icon purple"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="sol-title">Auto Sequences</div>
+        <div class="sol-body">AI drafts the Day 5 SMS, the Day 8 email, the Day 11 call prompt. <strong>Follow-up never dies again.</strong> The agent approves with one tap — nothing sends without them.</div>
+      </div>
+      <div class="sol-card blue-top">
+        <div class="sol-icon blue"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+        <div class="sol-title">Manager Dashboard</div>
+        <div class="sol-body">See every agent's pipeline in real time. Who's working, who's stalling, <strong>where deals are dying.</strong> Full visibility across all 10 states — no more spreadsheet guessing.</div>
+      </div>
+      <div class="sol-card green-top">
+        <div class="sol-icon green"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="sol-title">Built-in Compliance</div>
+        <div class="sol-body">TCPA windows, DNC checks, all 10 licensed states verified <strong>before every touch.</strong> New agents can't make a compliance mistake even if they try.</div>
+      </div>
+    </div>
+    <div class="click-hint"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>Click to continue</div>
+  </div>
+
+  <!-- SLIDE 4 — HOW IT WORKS -->
+  <div class="slide" id="slide-4" onclick="nextSlide()">
+    <div class="slide-bg"><div class="slide-bg-inner"></div></div>
+    <div class="slide-eyebrow">How It Works</div>
+    <div class="slide-h1" style="margin-bottom:44px;">Meta lead in. Action out.<br><em class="gold">Under 5 minutes.</em></div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-title">Lead arrives</div>
+        <div class="flow-body">Your lead guy delivers from Meta ads. Instant intake, no manual entry.</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-title">AI scores it</div>
+        <div class="flow-body">Intent scored 0–100. Veterans, truckers, whole life — all factored in.</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-title">Pulse updates</div>
+        <div class="flow-body">Right agent, right lead, right now. No manager needed to direct traffic.</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-title">Agent acts</div>
+        <div class="flow-body">One tap to call, approve an SMS, or advance the stage. Logged automatically.</div>
+      </div>
+    </div>
+    <div class="time-strip">
+      <div class="time-pill"><div class="time-val">&lt;5m</div><div class="time-label"><strong>Lead to first contact</strong>Your goal — we make it the default</div></div>
+      <div class="time-pill"><div class="time-val">14</div><div class="time-label"><strong>Day follow-up sequence</strong>Agents only gave 2–3 touches before</div></div>
+      <div class="time-pill"><div class="time-val">10</div><div class="time-label"><strong>Licensed states covered</strong>IL, WA, VA, OH, CA, LA, AL, NJ, SC, MI</div></div>
+    </div>
+    <div class="click-hint"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>Click to continue</div>
+  </div>
+
+  <!-- SLIDE 5 — ENTER DEMO -->
+  <div class="slide" id="slide-5" onclick="goDemo()">
+    <div class="slide-bg"><div class="slide-bg-inner"></div></div>
+    <div class="enter-label">Live Demo</div>
+    <div class="enter-h1">See it working.<br><em>Right now.</em></div>
+    <button class="enter-btn">
+      <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Launch the app
+    </button>
+    <div class="click-hint" style="bottom:72px;"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>Click anywhere to launch</div>
+  </div>
+
+  <!-- DEMO SLIDE -->
+  <div class="slide" id="slide-demo">
+    <div class="phone-shell">
+
+      <div class="status-bar">
+        <div class="status-time">9:41</div>
+        <div class="status-icons">
+          <div style="display:flex;gap:2px;align-items:flex-end;">
+            <div class="signal-bar" style="height:4px;opacity:.4"></div>
+            <div class="signal-bar" style="height:6px;opacity:.6"></div>
+            <div class="signal-bar" style="height:8px;opacity:.8"></div>
+            <div class="signal-bar" style="height:10px;"></div>
+          </div>
+          <div style="font-size:11px;font-weight:600;color:var(--text);opacity:.8">5G</div>
+          <svg width="25" height="12" viewBox="0 0 25 12">
+            <rect x="0" y="1" width="21" height="10" rx="2" fill="none" stroke="white" stroke-opacity=".5" stroke-width="1"/>
+            <rect x="21.5" y="3.5" width="2" height="5" rx="1" fill="white" fill-opacity=".5"/>
+            <rect x="1.5" y="2.5" width="15" height="7" rx="1.2" fill="white" fill-opacity=".85"/>
+          </svg>
+        </div>
+      </div>
+      <div class="dynamic-island"></div>
+
+      <!-- SCREEN: PULSE -->
+      <div class="app-screen active" id="screen-pulse">
+        <div class="topbar">
+          <div><div class="topbar-greeting">Sunday morning</div><div class="topbar-name">Agent Torres</div></div>
+          <div class="topbar-right">
+            <div class="notif-bubble"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot"></div></div>
+            <div class="avatar">AT</div>
+          </div>
+        </div>
+        <div class="h-rule"></div>
+        <div class="pulse-header">
+          <div class="pulse-eyebrow"><div class="pulse-live-dot"></div><div class="pulse-label-text">The Pulse</div></div>
+          <div class="pulse-count">3 leads today</div>
+        </div>
+        <div class="carousel-viewport">
+          <div class="carousel-track">
+            <!-- James T. HOT -->
+            <div class="slide-c">
+              <div class="lead-card card-hot">
+                <div class="card-inner">
+                  <div class="card-top">
+                    <div class="card-top-left">
+                      <div class="lead-type-row"><span class="badge badge-hot">HOT</span><span class="badge badge-type">Veteran Life</span><span class="source-tag">· Meta</span></div>
+                      <div><span class="lead-name-big">James T.</span><span class="lead-age">, 58</span></div>
+                    </div>
+                    <div class="score-block"><div class="score-ring hot"><div class="score-number hot">87</div></div><div class="score-word">Intent</div></div>
+                  </div>
+                  <div class="card-divider"></div>
+                  <div class="reason-section">
+                    <div class="reason-eyebrow">Why he's first today</div>
+                    <div class="reason-text"><strong>Marine veteran, no current coverage.</strong> Responded to your first call. Follow-up is <strong>5 days overdue</strong> — window closing fast.</div>
+                  </div>
+                  <div class="meta-strip">
+                    <div class="meta-cell"><div class="meta-key">Budget</div><div class="meta-val">$100–200<span style="font-size:10px;color:var(--dim);font-weight:400;">/mo</span></div></div>
+                    <div class="meta-cell"><div class="meta-key">Timing</div><div class="meta-val">30 days</div></div>
+                    <div class="meta-cell" style="border:none;margin:0;padding:0;"><div class="meta-key">State</div><div class="meta-val">IL <span class="licensed-check">✓</span></div></div>
+                  </div>
+                </div>
+                <div class="action-row">
+                  <button class="btn-call"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.43 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.08 6.08l.98-.98a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call Now</button>
+                  <button class="btn-msg"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Message</button>
+                </div>
+              </div>
+            </div>
+            <!-- David H. WARM -->
+            <div class="slide-c">
+              <div class="lead-card card-warm">
+                <div class="card-inner">
+                  <div class="card-top">
+                    <div class="card-top-left">
+                      <div class="lead-type-row"><span class="badge badge-warm">WARM</span><span class="badge badge-type">Trucker Life</span><span class="source-tag">· Meta</span></div>
+                      <div><span class="lead-name-big">David H.</span><span class="lead-age">, 51</span></div>
+                    </div>
+                    <div class="score-block"><div class="score-ring warm"><div class="score-number warm">71</div></div><div class="score-word">Intent</div></div>
+                  </div>
+                  <div class="card-divider"></div>
+                  <div class="reason-section">
+                    <div class="reason-eyebrow">Why he's up today</div>
+                    <div class="reason-text"><strong>Commercial driver, mentioned his family.</strong> Budget confirmed. Day 5 follow-up <strong>due today</strong> — SMS drafted and ready.</div>
+                  </div>
+                  <div class="meta-strip">
+                    <div class="meta-cell"><div class="meta-key">Budget</div><div class="meta-val">$120–250<span style="font-size:10px;color:var(--dim);font-weight:400;">/mo</span></div></div>
+                    <div class="meta-cell"><div class="meta-key">Sequence</div><div class="meta-val" style="color:var(--purple);">Day 5 / 14</div></div>
+                    <div class="meta-cell" style="border:none;margin:0;padding:0;"><div class="meta-key">State</div><div class="meta-val">IL <span class="licensed-check">✓</span></div></div>
+                  </div>
+                </div>
+                <div class="action-row">
+                  <button class="btn-call"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.43 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.08 6.08l.98-.98a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call Now</button>
+                  <button class="btn-followup"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Follow Up · Day 5</button>
+                </div>
+              </div>
+            </div>
+            <!-- Sarah M. WARM -->
+            <div class="slide-c">
+              <div class="lead-card card-warm">
+                <div class="card-inner">
+                  <div class="card-top">
+                    <div class="card-top-left">
+                      <div class="lead-type-row"><span class="badge badge-warm">WARM</span><span class="badge badge-type">Veteran Life</span><span class="source-tag">· Meta</span></div>
+                      <div><span class="lead-name-big">Sarah M.</span><span class="lead-age">, 42</span></div>
+                    </div>
+                    <div class="score-block"><div class="score-ring warm"><div class="score-number warm">79</div></div><div class="score-word">Intent</div></div>
+                  </div>
+                  <div class="card-divider"></div>
+                  <div class="reason-section">
+                    <div class="reason-eyebrow">Why she's up today</div>
+                    <div class="reason-text"><strong>Veteran spouse, two dependents.</strong> Quote sent 2 days ago. <strong>No response yet</strong> — follow-up window open now.</div>
+                  </div>
+                  <div class="meta-strip">
+                    <div class="meta-cell"><div class="meta-key">Budget</div><div class="meta-val">$150–300<span style="font-size:10px;color:var(--dim);font-weight:400;">/mo</span></div></div>
+                    <div class="meta-cell"><div class="meta-key">Stage</div><div class="meta-val" style="color:var(--amber);">Quote Sent</div></div>
+                    <div class="meta-cell" style="border:none;margin:0;padding:0;"><div class="meta-key">State</div><div class="meta-val">WA <span class="licensed-check">✓</span></div></div>
+                  </div>
+                </div>
+                <div class="action-row">
+                  <button class="btn-call"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.43 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.08 6.08l.98-.98a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call Now</button>
+                  <button class="btn-msg"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Message</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      </div>
+
+      <!-- SCREEN: LEADS -->
+      <div class="app-screen" id="screen-leads">
+        <div class="sheet-top">
+          <div class="sheet-back"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg><span class="sheet-back-text">Pulse</span></div>
+          <div class="sheet-title">Lead Detail</div>
+          <div class="sheet-more"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></div>
+        </div>
+        <div class="h-rule"></div>
+        <div class="sheet-body">
+          <div class="lead-hero">
+            <div class="lh-top">
+              <div>
+                <div class="lh-badges"><span class="badge badge-warm">WARM</span><span class="badge badge-type">Veteran Life</span><span class="source-tag">· Meta</span></div>
+                <div class="lh-name">Sarah M.<span>, 42</span></div>
+              </div>
+              <div class="score-block">
+                <div class="score-ring-sm warm"><div class="score-number warm" style="font-size:16px;position:relative;z-index:1;">79</div></div>
+                <div class="score-word">Intent</div>
+              </div>
+            </div>
+            <div class="lh-meta">
+              <div class="meta-cell"><div class="meta-key">Budget</div><div class="meta-val">$150–300<span style="font-size:9px;color:var(--dim);font-weight:400;">/mo</span></div></div>
+              <div class="meta-cell"><div class="meta-key">Last Touch</div><div class="meta-val no-reply">2d · no reply</div></div>
+              <div class="meta-cell" style="border:none;margin:0;padding:0;"><div class="meta-key">State</div><div class="meta-val">WA <span class="licensed-check">✓</span></div></div>
+            </div>
+          </div>
+          <div class="section-label"><span>Pipeline Stage</span><span class="adv-hint">Tap to advance →</span></div>
+          <div class="stage-track">
+            <div class="st-step"><div class="st-bubble done">✓</div><div class="st-label done">New</div></div>
+            <div class="st-line done"></div>
+            <div class="st-step"><div class="st-bubble done">✓</div><div class="st-label done">Contacted</div></div>
+            <div class="st-line done"></div>
+            <div class="st-step"><div class="st-bubble now">Q</div><div class="st-label now">Quote</div></div>
+            <div class="st-line next"></div>
+            <div class="st-step"><div class="st-bubble next">A</div><div class="st-label next">App</div></div>
+            <div class="st-line next"></div>
+            <div class="st-step"><div class="st-bubble next">✦</div><div class="st-label next">Issued</div></div>
+          </div>
+          <button class="advance-btn">
+            <div class="adv-left"><div class="adv-eyebrow">Next stage</div><div class="adv-action">Move to Application</div></div>
+            <div class="adv-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+          </button>
+          <div class="ai-brief-head"><span class="ai-spark"><svg viewBox="0 0 24 24"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"/></svg></span><span class="ai-brief-label">AI Brief</span></div>
+          <div class="ai-brief-card"><div class="ai-brief-text"><strong>Veteran spouse, two dependents.</strong> Quote sent 2 days ago, no open detected. She mentioned her husband's deployment — <strong>family protection is the right angle.</strong> A brief check-in call today, not a pitch.</div></div>
+          <div class="section-label">Activity</div>
+          <div class="activity">
+            <div class="act-row"><div class="act-dot amber"></div><div class="act-body"><div class="act-title">Quote sent · $175/mo whole life</div><div class="act-sub">Emailed PDF · no open detected</div></div><div class="act-time">Jun 12</div></div>
+            <div class="act-row"><div class="act-dot green"></div><div class="act-body"><div class="act-title">Call connected · 8 min</div><div class="act-sub">Confirmed budget. Mentioned deployment.</div></div><div class="act-time">Jun 11</div></div>
+            <div class="act-row"><div class="act-dot dim"></div><div class="act-body"><div class="act-title">Lead received · Meta</div><div class="act-sub">Score 79 · assigned to Torres</div></div><div class="act-time">Jun 10</div></div>
+          </div>
+          <div class="scroll-pad"></div>
+        </div>
+        <div class="action-footer">
+          <button class="btn-call-full"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.43 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.08 6.08l.98-.98a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Call Sarah Now</button>
+          <div class="secondary-row">
+            <button class="btn-ghost"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Message</button>
+            <button class="btn-ghost"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>Add Note</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN: PIPELINE -->
+      <div class="app-screen" id="screen-pipeline">
+        <div class="topbar"><div><div class="topbar-greeting">Sunday morning</div><div class="topbar-name">Agent Torres</div></div><div class="topbar-right"><div class="avatar">AT</div></div></div>
+        <div class="h-rule"></div>
+        <div class="coming-soon">
+          <div class="cs-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <div class="cs-title">Pipeline View</div>
+          <div class="cs-body">Full stage view across all leads — New, Contacted, Quote Sent, Application, Issued. Coming in Phase 2.</div>
+          <div class="cs-pill">In Development</div>
+        </div>
+      </div>
+
+      <!-- SCREEN: PROFILE -->
+      <div class="app-screen" id="screen-profile">
+        <div class="topbar"><div><div class="topbar-greeting">Sunday morning</div><div class="topbar-name">My Profile</div></div><div class="topbar-right"><div class="avatar">AT</div></div></div>
+        <div class="h-rule"></div>
+        <div class="profile-body">
+          <div class="profile-hero">
+            <div class="profile-avatar">AT</div>
+            <div class="profile-name">Agent Torres</div>
+            <div class="profile-role">Life Insurance · ISG Financial</div>
+            <div class="profile-tags"><span class="profile-tag">Veterans</span><span class="profile-tag">Truckers</span><span class="profile-tag">Whole Life</span></div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-card"><div class="stat-val gold">28</div><div class="stat-key">Active Leads</div><div class="stat-delta">↑ 4 this week</div></div>
+            <div class="stat-card"><div class="stat-val green">34%</div><div class="stat-key">Contact Rate</div><div class="stat-delta">↑ 8% vs last mo</div></div>
+            <div class="stat-card"><div class="stat-val amber">6</div><div class="stat-key">Policies Issued</div><div class="stat-delta">This month</div></div>
+            <div class="stat-card"><div class="stat-val purple">$8.4k</div><div class="stat-key">Commission MTD</div><div class="stat-delta">↑ vs $6.1k last mo</div></div>
+          </div>
+          <div class="section-label">Licensed States</div>
+          <div class="license-row"><div class="lic-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><div class="lic-text"><div class="lic-title">IL · WA · VA · OH · CA</div><div class="lic-sub">Life &amp; Health · Active</div></div><span class="lic-check">✓</span></div>
+          <div class="license-row"><div class="lic-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><div class="lic-text"><div class="lic-title">LA · AL · NJ · SC · MI</div><div class="lic-sub">Life &amp; Health · Active</div></div><span class="lic-check">✓</span></div>
+          <div class="section-label" style="margin-top:12px;">Team · ISG Financial</div>
+          <div class="team-row"><div class="team-av" style="background:linear-gradient(135deg,#0f1e3a,#1a2e55);">AT</div><div class="team-info"><div class="team-name">Agent Torres</div><div class="team-stat">28 leads · 6 issued</div></div><div class="team-score">34%</div></div>
+          <div class="team-row"><div class="team-av" style="background:linear-gradient(135deg,#0e2015,#152e20);">AJ</div><div class="team-info"><div class="team-name">Agent Johnson</div><div class="team-stat">21 leads · 4 issued</div></div><div class="team-score">29%</div></div>
+          <div class="team-row"><div class="team-av" style="background:linear-gradient(135deg,#1e0e2a,#2a1440);">AW</div><div class="team-info"><div class="team-name">Agent Williams</div><div class="team-stat">19 leads · 3 issued</div></div><div class="team-score">24%</div></div>
+          <div class="scroll-pad"></div>
+        </div>
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="switchTab('pulse')"><div class="nav-icon-wrap active" id="nav-pulse"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></div><div class="nav-label active" id="nl-pulse">Pulse</div></div>
+        <div class="nav-item" onclick="switchTab('leads')"><div class="nav-icon-wrap" id="nav-leads"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="nav-label" id="nl-leads">Leads</div></div>
+        <div class="nav-item" onclick="switchTab('pipeline')"><div class="nav-icon-wrap" id="nav-pipeline"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="nav-label" id="nl-pipeline">Pipeline</div></div>
+        <div class="nav-item" onclick="switchTab('profile')"><div class="nav-icon-wrap" id="nav-profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div class="nav-label" id="nl-profile">Profile</div></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const slides = ['slide-1','slide-2','slide-3','slide-4','slide-5','slide-demo'];
+  let current = 0;
+  const pdots = document.querySelectorAll('.pdot');
+  const skipBtn = document.getElementById('skip-btn');
+  const backBtn = document.getElementById('back-btn');
+  const progress = document.getElementById('progress');
+
+  function showSlide(n) {
+    document.getElementById(slides[current]).classList.remove('active');
+    current = n;
+    document.getElementById(slides[current]).classList.add('active');
+    pdots.forEach((d,i) => d.classList.toggle('active', i === current));
+    const isDemo = current === slides.length - 1;
+    progress.classList.toggle('hidden', isDemo);
+    skipBtn.classList.toggle('hidden', isDemo);
+    backBtn.classList.toggle('visible', isDemo);
+  }
+
+  function nextSlide() { if (current < slides.length - 1) showSlide(current + 1); }
+  function goDemo()    { showSlide(slides.length - 1); }
+  function goBack()    { showSlide(slides.length - 2); }
+
+  document.addEventListener('keydown', e => {
+    if (current === slides.length - 1) return;
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') nextSlide();
+    if (e.key === 'ArrowLeft' && current > 0) showSlide(current - 1);
+  });
+
+  const tabs = ['pulse','leads','pipeline','profile'];
+  function switchTab(tab) {
+    tabs.forEach(t => {
+      document.getElementById('screen-' + t).classList.toggle('active', t === tab);
+      document.getElementById('nav-' + t).classList.toggle('active', t === tab);
+      document.getElementById('nl-' + t).classList.toggle('active', t === tab);
+    });
+  }
+</script>
+</body>
+</html>
