@@ -1116,7 +1116,10 @@ function runStep(i) {
       let desiredScroll;
 
       if (i === tourSteps.length - 1) {
-        desiredScroll = m.scrollHeight;
+        const flagsEl = document.getElementById('tour-flags');
+        const mainRect = m.getBoundingClientRect();
+        const flagsRect = flagsEl.getBoundingClientRect();
+        desiredScroll = m.scrollTop + flagsRect.top - mainRect.top - 80;
       } else {
         const target       = document.getElementById(tourSteps[i].target);
         const mainRect     = m.getBoundingClientRect();
@@ -1133,8 +1136,8 @@ function runStep(i) {
         lockScroll();
         // force re-check scroll position for last step
         if (i === tourSteps.length - 1) {
+          layout.style.height = '';
           m.style.overflow = 'hidden';
-          m.scrollTop = m.scrollHeight;
         }
         placeElements(i);
       }, 650);
