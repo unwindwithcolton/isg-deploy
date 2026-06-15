@@ -1022,19 +1022,27 @@ function goToStep(i) {
   const m      = mainEl();
   const target = document.getElementById(tourSteps[i].target);
 
-  // Distance from the top of .main's visible area to the top of the target,
-  // plus however far .main has already scrolled = absolute scroll position needed.
-  // Subtract 40px for breathing room above the highlight.
+  // Compute exactly how far .main needs to scroll so the target
+  // sits 40px from the top of the visible area.
   const targetScrollTop = m.scrollTop + target.getBoundingClientRect().top - m.getBoundingClientRect().top - 40;
 
-  // Smooth scroll .main to that exact position
-  m.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+  // Apply smooth scroll via CSS (more reliable than scrollTo behavior:'smooth')
+  // then set scrollTop directly.
+  m.style.scrollBehavior = 'smooth';
+  m.scrollTop = targetScrollTop;
 
-  // Wait for the smooth scroll to fully land, then read where the element
-  // actually is on screen and place the highlight + tooltip there.
-  setTimeout(() => {
+  // scrollend fires the moment the scroll animation completes.
+  // setTimeout is a fallback for browsers that don't support scrollend.
+  let settled = false;
+  const done = () => {
+    if (settled) return;
+    settled = true;
+    m.removeEventListener('scrollend', done);
+    m.style.scrollBehavior = '';
     placeElements(i);
-  }, SCROLL_DURATION);
+  };
+  m.addEventListener('scrollend', done);
+  setTimeout(done, SCROLL_DURATION);
 }
 
 function placeElements(i) {
