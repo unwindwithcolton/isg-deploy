@@ -68,7 +68,6 @@ body {
   display:flex; flex-direction:column;
 }
 
-/* ── NAV ── */
 .topnav {
   height:72px;
   background:linear-gradient(90deg,var(--navy-700) 0%,var(--navy-600) 50%,var(--navy-550) 100%);
@@ -101,7 +100,6 @@ body {
   box-shadow:0 0 0 3px var(--gold-glow);
 }
 
-/* Tour button in nav */
 .tour-btn {
   display:flex; align-items:center; gap:7px;
   background:var(--gold-dim); border:1px solid var(--border-g);
@@ -112,10 +110,8 @@ body {
 .tour-btn:hover { background:var(--gold-mid); }
 .tour-btn svg { width:14px; height:14px; stroke:var(--gold-hi); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 
-/* ── LAYOUT ── */
 .layout { display:flex; flex:1; overflow:hidden; height:calc(100vh - 72px); }
 
-/* ── SIDEBAR ── */
 .sidebar {
   width:210px; flex-shrink:0;
   background:linear-gradient(180deg,var(--navy-700) 0%,var(--navy-800) 100%);
@@ -138,18 +134,13 @@ body {
 .sb-badge.red  { background:var(--red-dim);  color:var(--red-hi); }
 .sb-badge.gold { background:var(--gold-dim); color:var(--gold-hi); }
 
-/* ── MAIN ── */
 .main { flex:1; overflow-y:auto; }
 .main::-webkit-scrollbar { width:4px; }
 .main::-webkit-scrollbar-thumb { background:var(--navy-400); border-radius:2px; }
 
-/* ── PAGES ── */
 .page { display:none; }
 .page.active { display:block; }
 
-/* ══════════════════════════════
-   DASHBOARD PAGE
-══════════════════════════════ */
 .page-hd {
   padding:var(--sp-md) var(--sp-md) 0;
   display:flex; align-items:flex-end; justify-content:space-between;
@@ -179,7 +170,6 @@ body {
 .btn-ghost-sm:hover { border-color:var(--border-g); color:var(--text-1); }
 .btn-ghost-sm svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 
-/* KPI */
 .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--sp-xs); padding:0 var(--sp-md); margin-bottom:var(--sp-sm); }
 .kpi-card {
   height:var(--kpi-h);
@@ -212,7 +202,6 @@ body {
 .kpi-label { font-size:13px; color:var(--text-2); font-weight:500; }
 .kpi-sub   { font-size:11px; color:var(--text-4); font-weight:500; }
 
-/* SECTION HEADER */
 .sec-hd { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:var(--sp-xs); }
 .sec-title { font-size:15px; font-weight:700; color:var(--text-1); letter-spacing:-0.3px; }
 .sec-meta  { font-size:12px; color:var(--text-3); margin-top:2px; }
@@ -221,10 +210,8 @@ body {
 .fp:hover { color:var(--text-1); }
 .fp.active { background:var(--gold-dim); border-color:var(--border-g); color:var(--gold-hi); }
 
-/* MAIN GRID */
 .main-grid { display:grid; grid-template-columns:1fr 320px; gap:var(--sp-xs); padding:0 var(--sp-md); margin-bottom:var(--sp-xs); }
 
-/* PIPELINE TABLE */
 .pipe-wrap {
   background:linear-gradient(180deg,var(--navy-550) 0%,var(--navy-700) 100%);
   border:1px solid var(--border-2); border-radius:var(--r-card); overflow:hidden;
@@ -269,7 +256,6 @@ body {
 .ra-reassign { background:var(--navy-500); border-color:var(--border-2); color:var(--text-2); }
 .ra-reassign:hover { border-color:var(--border-g); color:var(--text-1); }
 
-/* TEAM PANEL */
 .team-panel {
   background:linear-gradient(180deg,var(--navy-550) 0%,var(--navy-700) 100%);
   border:1px solid var(--border-2); border-radius:var(--r-card); overflow:hidden;
@@ -313,7 +299,6 @@ body {
 .tc-btn.nudge { background:var(--red-dim); border-color:var(--red-mid); color:var(--red-hi); box-shadow:0 0 12px rgba(255,51,51,0.15); }
 .tc-btn.nudge:hover { background:var(--red-mid); }
 
-/* RED FLAGS */
 .flags-section { padding:0 var(--sp-md) var(--sp-md); }
 .flag-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--sp-xs); }
 .flag-card { border-radius:var(--r-card); padding:var(--sp-sm); position:relative; overflow:hidden; }
@@ -357,9 +342,6 @@ body {
 .flag-cta.info   { background:rgba(100,140,255,0.08); border-color:rgba(100,140,255,0.20); color:#8aacff; }
 .flag-cta.info:hover { background:rgba(100,140,255,0.14); transform:translateY(-1px); }
 
-/* ══════════════════════════════
-   AGENT DETAIL PAGE
-══════════════════════════════ */
 .agent-hero {
   margin:var(--sp-md) var(--sp-md) var(--sp-sm);
   background:linear-gradient(135deg,rgba(240,184,64,0.12) 0%,var(--navy-550) 40%,var(--navy-700) 100%);
@@ -396,9 +378,6 @@ body {
 .alt-title { font-size:15px; font-weight:700; color:var(--text-1); }
 .alt-meta  { font-size:12px; color:var(--text-3); }
 
-/* ══════════════════════════════
-   PERFORMANCE PAGE
-══════════════════════════════ */
 .perf-grid { display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-xs); padding:0 var(--sp-md) var(--sp-md); }
 .perf-card {
   background:linear-gradient(145deg,var(--navy-550) 0%,var(--navy-700) 100%);
@@ -409,7 +388,6 @@ body {
 .perf-title { font-size:15px; font-weight:700; color:var(--text-1); margin-bottom:var(--sp-xs); }
 .perf-sub   { font-size:12px; color:var(--text-3); margin-bottom:var(--sp-sm); }
 
-/* Bar chart */
 .bar-chart { display:flex; flex-direction:column; gap:12px; }
 .bar-row { display:flex; align-items:center; gap:var(--sp-xs); }
 .bar-label { width:120px; font-size:12px; font-weight:600; color:var(--text-2); flex-shrink:0; }
@@ -425,7 +403,6 @@ body {
 .bar-fill.blue   { background:linear-gradient(90deg,#4a8cf7 0%,#7aacff 100%); box-shadow:0 0 12px rgba(74,140,247,0.40); color:#fff; }
 .bar-val { width:44px; text-align:right; font-size:13px; font-weight:700; color:var(--text-1); flex-shrink:0; }
 
-/* Leaderboard */
 .leaderboard { display:flex; flex-direction:column; gap:8px; }
 .lb-row {
   display:flex; align-items:center; gap:var(--sp-xs);
@@ -448,9 +425,6 @@ body {
 .lb-stat-val.gold { color:var(--gold-hi); }
 .lb-stat-key { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-4); }
 
-/* ══════════════════════════════
-   BACK BUTTON (sub pages)
-══════════════════════════════ */
 .back-bar {
   display:flex; align-items:center; gap:10px;
   padding:var(--sp-sm) var(--sp-md) 0;
@@ -467,9 +441,6 @@ body {
 .back-btn svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .back-page-title { font-size:20px; font-weight:900; letter-spacing:-0.6px; color:var(--text-1); }
 
-/* ══════════════════════════════
-   TOUR OVERLAY
-══════════════════════════════ */
 .tour-overlay {
   display:none;
   position:fixed; inset:0; z-index:200;
@@ -525,7 +496,6 @@ body {
 </head>
 <body>
 
-<!-- TOP NAV -->
 <nav class="topnav">
   <div class="nav-brand">
     <div class="nav-logo">ISG<span>.</span></div>
@@ -547,8 +517,6 @@ body {
 </nav>
 
 <div class="layout">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sb-section">
       <div class="sb-eyebrow">Overview</div>
@@ -591,7 +559,6 @@ body {
 
   <main class="main">
 
-    <!-- ══ DASHBOARD PAGE ══ -->
     <div class="page active" id="page-dashboard">
       <div class="page-hd">
         <div>
@@ -604,7 +571,6 @@ body {
         </div>
       </div>
 
-      <!-- KPI Row -->
       <div class="kpi-row" id="tour-kpi">
         <div class="kpi-card accent">
           <div class="kpi-top"><div class="kpi-icon gold"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="kpi-badge">+9 this mo</span></div>
@@ -628,9 +594,7 @@ body {
         </div>
       </div>
 
-      <!-- Main Grid -->
       <div class="main-grid">
-        <!-- Pipeline -->
         <div id="tour-pipeline">
           <div class="sec-hd">
             <div><div class="sec-title">Live Pipeline</div><div class="sec-meta">47 leads across all agents</div></div>
@@ -708,7 +672,6 @@ body {
           </div>
         </div>
 
-        <!-- Team -->
         <div id="tour-team">
           <div class="sec-hd"><div><div class="sec-title">Team Activity</div><div class="sec-meta">Today · 3 of 10 shown</div></div></div>
           <div class="team-panel">
@@ -755,7 +718,6 @@ body {
         </div>
       </div>
 
-      <!-- Red Flags -->
       <div class="flags-section" id="tour-flags">
         <div class="sec-hd" style="margin-bottom:var(--sp-xs);"><div><div class="sec-title">Red Flags</div><div class="sec-meta">Surfaced automatically — needs your attention</div></div></div>
         <div class="flag-grid">
@@ -792,7 +754,6 @@ body {
       </div>
     </div>
 
-    <!-- ══ AGENT DETAIL PAGE ══ -->
     <div class="page" id="page-agents">
       <div class="back-bar">
         <button class="back-btn" onclick="showPage('dashboard')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Dashboard</button>
@@ -872,7 +833,6 @@ body {
       </div>
     </div>
 
-    <!-- ══ PERFORMANCE PAGE ══ -->
     <div class="page" id="page-performance">
       <div class="back-bar">
         <button class="back-btn" onclick="showPage('dashboard')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Dashboard</button>
@@ -964,7 +924,6 @@ body {
   </main>
 </div>
 
-<!-- ══ TOUR OVERLAY ══ -->
 <div class="tour-overlay" id="tour-overlay">
   <svg class="tour-svg-backdrop" id="tour-svg">
     <defs>
@@ -1029,47 +988,22 @@ const tourSteps = [
   }
 ];
 
-// How long to wait for smooth scroll to settle before relocking and placing elements.
-// Match or slightly exceed your longest CSS smooth-scroll duration.
-const SCROLL_SETTLE_MS = 650;
-
+const SCROLL_DURATION = 500; // ms — matches smooth scroll duration
 let currentStep = 0;
 const mainEl = () => document.querySelector('.main');
 
-function preventDefault(e) { e.preventDefault(); e.stopPropagation(); }
-
-function blockScrollKeys(e) {
-  // Block page-scroll keys; allow Enter for tour advancement
-  const scrollKeys = [32, 33, 34, 35, 36, 38, 40]; // space, pgup, pgdn, home, end, up, down
-  if (scrollKeys.includes(e.keyCode)) e.preventDefault();
-}
-
-/*
- * KEY INSIGHT: We never set overflow:hidden on .main itself.
- * Doing so freezes scrollTop and makes programmatic scrollTo() a no-op.
- * Instead we block user-scroll via wheel/touch/key event listeners only,
- * while leaving .main's overflow as 'auto' so we can still drive it programmatically.
- */
-function lockUserScroll() {}
-function unlockUserScroll() {}
-
 function startTour() {
   currentStep = 0;
-  unlockUserScroll(); // clear any stale lock first
   document.getElementById('tour-overlay').classList.add('active');
-  // Snap to top instantly before step 1
+  // Snap to top instantly so Step 1 (KPI row) is always in view
   mainEl().scrollTo({ top: 0, behavior: 'instant' });
-  // Brief delay to let the instant scroll commit, then lock and place
+  // Wait one frame for the instant scroll to commit, then place
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      lockUserScroll();
-      placeElements(0);
-    });
+    placeElements(0);
   });
 }
 
 function endTour() {
-  unlockUserScroll();
   currentStep = 0;
   document.getElementById('tour-overlay').classList.remove('active');
 }
@@ -1081,38 +1015,28 @@ function nextTourStep() {
     document.getElementById('perf-prompt').style.display = 'flex';
     return;
   }
-  runStep(currentStep);
+  goToStep(currentStep);
 }
 
-function runStep(i) {
+function goToStep(i) {
   const m      = mainEl();
   const target = document.getElementById(tourSteps[i].target);
 
-  // Fully unlock everything — wheel, touch, keys, body — so the browser
-  // can execute the programmatic scroll without any interference.
-  unlockUserScroll();
-  document.body.style.overflow = '';
+  // Calculate exactly how far .main needs to scroll so the target element
+  // sits 40px from the top of the visible scroll area — giving the user
+  // clear breathing room above the highlight.
+  const targetScrollTop = m.scrollTop + target.getBoundingClientRect().top - m.getBoundingClientRect().top - 40;
 
-  // Directly set scrollTop (no smooth, no event dependency, always works).
-  // getBoundingClientRect gives position relative to viewport; we convert
-  // that to a scrollTop offset inside .main.
-  m.scrollTop = m.scrollHeight;
+  // Smooth scroll to that precise position
+  m.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
 
-  // Two rAFs: first lets the scroll commit to layout, second lets it paint.
-  // placeElements reads getBoundingClientRect so it must run after paint.
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      lockUserScroll();
-      placeElements(i);
-    });
-  });
+  // Wait for the smooth scroll to finish, then read the final coordinates
+  // and place the highlight + tooltip exactly where the element landed.
+  setTimeout(() => {
+    placeElements(i);
+  }, SCROLL_DURATION);
 }
 
-/*
- * placeElements: positions the SVG cutout, gold highlight ring, and tooltip
- * over the target element. Must be top-level so both startTour() and runStep()
- * can call it (fixes the original scope bug where it was nested inside runStep).
- */
 function placeElements(i) {
   const step   = tourSteps[i];
   const target = document.getElementById(step.target);
@@ -1122,9 +1046,9 @@ function placeElements(i) {
   const vh     = window.innerHeight;
 
   const hx = rect.left   - pad;
-  const hy = rect.top    - pad;
-  const hw = rect.width  + pad * 2;
-  const hh = rect.height + pad * 2;
+  const hy  = rect.top   - pad;
+  const hw  = rect.width + pad * 2;
+  const hh  = rect.height + pad * 2;
 
   // Punch transparent hole through the SVG backdrop mask
   const hole = document.getElementById('tour-hole');
@@ -1140,7 +1064,7 @@ function placeElements(i) {
   hl.style.width  = hw + 'px';
   hl.style.height = hh + 'px';
 
-  // Populate tooltip content first so we can measure its real rendered height
+  // Populate tooltip content before measuring its height
   const tt = document.getElementById('tour-tooltip');
   document.getElementById('tt-step').textContent  = `Step ${i + 1} of ${tourSteps.length}`;
   document.getElementById('tt-title').textContent = step.title;
@@ -1152,7 +1076,7 @@ function placeElements(i) {
     `<div class="tt-dot${j === i ? ' active' : ''}"></div>`
   ).join('');
 
-  // Measure actual tooltip height after content is set (fixes hardcoded 220px bug)
+  // Measure actual rendered tooltip height so placement is never guesswork
   const ttW    = 300;
   const ttH    = tt.getBoundingClientRect().height || 220;
   const margin = 18;
@@ -1167,12 +1091,12 @@ function placeElements(i) {
   } else if (step.placement === 'left') {
     left = hx - ttW - margin;
     top  = hy + hh / 2 - ttH / 2;
-  } else { // right
+  } else {
     left = hx + hw + margin;
     top  = hy + hh / 2 - ttH / 2;
   }
 
-  // Clamp tooltip to viewport edges
+  // Clamp tooltip so it never goes off screen
   left = Math.max(margin, Math.min(left, vw - ttW - margin));
   top  = Math.max(margin, Math.min(top,  vh - ttH - margin));
 
@@ -1180,10 +1104,10 @@ function placeElements(i) {
   tt.style.top  = top  + 'px';
 }
 
-// Keyboard shortcuts for the tour
+// Keyboard shortcuts
 document.addEventListener('keydown', e => {
   if (!document.getElementById('tour-overlay').classList.contains('active')) return;
-  if (e.key === 'Escape')                         endTour();
+  if (e.key === 'Escape')                          endTour();
   if (e.key === 'ArrowRight' || e.key === 'Enter') nextTourStep();
 });
 </script>
