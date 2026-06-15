@@ -1130,6 +1130,11 @@ function runStep(i) {
       setTimeout(() => {
         layout.style.overflow = '';
         lockScroll();
+        // force re-check scroll position for last step
+        if (i === tourSteps.length - 1) {
+          m.style.overflow = 'hidden';
+          m.scrollTop = m.scrollHeight;
+        }
         placeElements(i);
       }, 650);
     });
