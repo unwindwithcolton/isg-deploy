@@ -203,7 +203,7 @@ html, body {
 /* ═══════════════════════════════════════
    DEMO SLIDE + PHONE
 ═══════════════════════════════════════ */
-#slide-demo { background: #050810; padding: 0; justify-content: center; align-items: center; cursor: default; }
+#slide-demo { background: #050810; padding: 0; justify-content: center; align-items: center; cursor: default; flex-direction: row; gap: 60px; }
 
 .phone-shell {
   width: 375px; height: 760px;
@@ -560,6 +560,7 @@ html, body {
 
   <!-- DEMO SLIDE -->
   <div class="slide" id="slide-demo">
+    <div style="display:flex;align-items:center;gap:60px;">
     <div class="phone-shell">
 
       <div class="status-bar">
@@ -795,6 +796,18 @@ html, body {
         <div class="nav-item" onclick="switchTab('profile')"><div class="nav-icon-wrap" id="nav-profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div class="nav-label" id="nl-profile">Profile</div></div>
       </div>
 
+    </div>
+  </div>
+    <!-- Owner Hub CTA -->
+    <div style="display:flex;flex-direction:column;gap:20px;align-items:flex-start;max-width:280px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);">What's next</div>
+      <div style="font-size:28px;font-weight:900;letter-spacing:-1px;line-height:1.1;color:#eef1f8;">See the manager<br>side of the house.</div>
+      <div style="font-size:13px;color:#6b7a99;line-height:1.65;">The Owner Hub gives you full visibility across all 10 agents — who's working, who's stalling, and where deals are dying.</div>
+      <button onclick="window.location.href='/dashboard'" style="display:flex;align-items:center;gap:10px;background:var(--gold);color:#070c1a;border:none;border-radius:14px;padding:16px 28px;font-size:14px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;letter-spacing:-0.3px;">
+        Continue to Owner Hub
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#070c1a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
     </div>
   </div>
 

@@ -1201,5 +1201,17 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === 'Enter') nextTourStep();
 });
 </script>
+<!-- Tour Prompt Modal -->
+<div id="tour-prompt" style="position:fixed;inset:0;background:rgba(5,8,16,0.85);z-index:300;display:flex;align-items:center;justify-content:center;">
+  <div style="background:linear-gradient(145deg,#122440,#0a1526);border:1px solid rgba(240,184,64,0.28);border-radius:20px;padding:40px;max-width:420px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.7);">
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#f0b840;margin-bottom:16px;">Welcome to the Owner Hub</div>
+    <div style="font-size:28px;font-weight:900;letter-spacing:-1px;color:#f8faff;margin-bottom:12px;">Your command center.</div>
+    <div style="font-size:14px;color:#8ea4c8;line-height:1.65;margin-bottom:32px;">Take a 60-second tour to see how the dashboard surfaces what matters — before your agents even ask.</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button onclick="document.getElementById('tour-prompt').style.display='none';startTour();" style="background:linear-gradient(135deg,#ffe080,#f0b840,#cc8e1a);color:#02040a;border:none;border-radius:12px;padding:14px 28px;font-size:14px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;">Take the Tour →</button>
+      <button onclick="document.getElementById('tour-prompt').style.display='none';" style="background:transparent;color:#5a72a0;border:none;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;padding:8px;">Skip for now</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
