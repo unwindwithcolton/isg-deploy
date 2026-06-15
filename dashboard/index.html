@@ -1098,51 +1098,33 @@ function nextTourStep() {
 }
 
 function runStep(i) {
-  const m      = mainEl();
-  const layout = document.querySelector('.layout');
+  const m = mainEl();
 
-  // 1. Unlock everything — .main AND .layout (which has overflow:hidden in CSS)
-  m.style.overflow      = 'auto';
-  layout.style.overflow = 'visible';
-  layout.style.height   = 'auto';
-  document.body.style.overflow = '';
+  // Temporarily enable scrolling on main only
+  m.style.overflow = 'auto';
   window.removeEventListener('wheel',     preventDefault);
   window.removeEventListener('touchmove', preventDefault);
   document.removeEventListener('keydown',  blockScrollKeys);
 
-  // 2. Give browser one frame to apply overflow changes before reading scrollHeight
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      let desiredScroll;
+  const flagsEl  = document.getElementById('tour-flags');
+  const mainRect = m.getBoundingClientRect();
+  const flagsRect = flagsEl.getBoundingClientRect();
 
-      if (i === tourSteps.length - 1) {
-        const flagsEl = document.getElementById('tour-flags');
-        const mainRect = m.getBoundingClientRect();
-        const flagsRect = flagsEl.getBoundingClientRect();
-        desiredScroll = m.scrollTop + flagsRect.top - mainRect.top - 80;
-      } else {
-        const target       = document.getElementById(tourSteps[i].target);
-        const mainRect     = m.getBoundingClientRect();
-        const targetRect   = target.getBoundingClientRect();
-        const targetRelTop = targetRect.top - mainRect.top + m.scrollTop;
-        desiredScroll = Math.max(0, targetRelTop - 90);
-      }
+  let desiredScroll;
+  if (i === tourSteps.length - 1) {
+    desiredScroll = m.scrollTop + flagsRect.top - mainRect.top - 80;
+  } else {
+    const target = document.getElementById(tourSteps[i].target);
+    const targetRect = target.getBoundingClientRect();
+    desiredScroll = Math.max(0, m.scrollTop + targetRect.top - mainRect.top - 90);
+  }
 
-      m.scrollTo({ top: desiredScroll, behavior: 'smooth' });
+  m.scrollTo({ top: desiredScroll, behavior: 'smooth' });
 
-      // 3. After scroll lands, restore layout overflow and re-lock
-      setTimeout(() => {
-        layout.style.overflow = '';
-        lockScroll();
-        // force re-check scroll position for last step
-        if (i === tourSteps.length - 1) {
-          layout.style.height = '';
-          m.style.overflow = 'hidden';
-        }
-        placeElements(i);
-      }, 650);
-    });
-  });
+  setTimeout(() => {
+    lockScroll();
+    placeElements(i);
+  }, 650);
 }
 
 function placeElements(i) {
