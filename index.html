@@ -180,11 +180,11 @@ html, body {
    SLIDE 4 — HOW IT WORKS
 ═══════════════════════════════════════ */
 .flow { display: flex; align-items: center; gap: 0; max-width: 920px; width: 100%; }
-.flow-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.flow-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; justify-content: flex-start; padding-top: 0; }
 .flow-num { width: 48px; height: 48px; border-radius: 50%; background: var(--card-up); border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: var(--gold); }
 .flow-title { font-size: 14px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
 .flow-body  { font-size: 13px; color: var(--text); line-height: 1.6; max-width: 150px; }
-.flow-arrow { color: var(--dim); font-size: 22px; padding: 0 6px; margin-bottom: 38px; flex-shrink: 0; }
+.flow-arrow { color: var(--dim); font-size: 22px; padding: 0 6px; margin-bottom: 0; flex-shrink: 0; align-self: flex-start; margin-top: 14px; }
 .time-strip { display: flex; gap: 14px; max-width: 920px; width: 100%; margin-top: 36px; }
 .time-pill { flex: 1; background: var(--card); border: 1px solid var(--border2); border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; gap: 12px; }
 .time-val   { font-size: 22px; font-weight: 900; color: var(--gold); letter-spacing: -0.5px; flex-shrink: 0; }
