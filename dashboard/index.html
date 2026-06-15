@@ -1110,13 +1110,21 @@ function runStep(i) {
   const mainRect   = m.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
   const newScrollTop = Math.max(0, m.scrollTop + (targetRect.top - mainRect.top) - 80);
+  console.log('[tour] step', i, 'target:', tourSteps[i].target,
+    '| m.scrollTop before:', m.scrollTop,
+    '| targetRect.top:', targetRect.top,
+    '| mainRect.top:', mainRect.top,
+    '| newScrollTop:', newScrollTop);
   m.scrollTop = newScrollTop;
+  console.log('[tour] m.scrollTop after set:', m.scrollTop);
 
-  // Re-lock after one frame (scroll is instant so no settle time needed),
-  // then place the highlight and tooltip over the now-visible element.
+  // Two rAFs: first lets the scroll commit to layout, second lets it paint.
+  // placeElements reads getBoundingClientRect so it must run after paint.
   requestAnimationFrame(() => {
-    lockUserScroll();
-    placeElements(i);
+    requestAnimationFrame(() => {
+      lockUserScroll();
+      placeElements(i);
+    });
   });
 }
 
