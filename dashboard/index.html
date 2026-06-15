@@ -1107,16 +1107,7 @@ function runStep(i) {
   // Directly set scrollTop (no smooth, no event dependency, always works).
   // getBoundingClientRect gives position relative to viewport; we convert
   // that to a scrollTop offset inside .main.
-  const mainRect   = m.getBoundingClientRect();
-  const targetRect = target.getBoundingClientRect();
-  const newScrollTop = Math.max(0, m.scrollTop + (targetRect.top - mainRect.top) - 80);
-  console.log('[tour] step', i, 'target:', tourSteps[i].target,
-    '| m.scrollTop before:', m.scrollTop,
-    '| targetRect.top:', targetRect.top,
-    '| mainRect.top:', mainRect.top,
-    '| newScrollTop:', newScrollTop);
-  m.scrollTop = newScrollTop;
-  console.log('[tour] m.scrollTop after set:', m.scrollTop);
+  m.scrollTop = m.scrollHeight;
 
   // Two rAFs: first lets the scroll commit to layout, second lets it paint.
   // placeElements reads getBoundingClientRect so it must run after paint.
