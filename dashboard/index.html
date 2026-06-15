@@ -1091,8 +1091,7 @@ function nextTourStep() {
   currentStep++;
   if (currentStep >= tourSteps.length) {
     endTour();
-    showPage('performance');
-    document.getElementById('sb-perf').classList.add('active');
+    document.getElementById('perf-prompt').style.display = 'flex';
     return;
   }
   runStep(currentStep);
@@ -1192,7 +1191,7 @@ function placeElements(i) {
   document.getElementById('tt-step').textContent  = `Step ${i + 1} of ${tourSteps.length}`;
   document.getElementById('tt-title').textContent = step.title;
   document.getElementById('tt-body').textContent  = step.body;
-  document.getElementById('tt-next').textContent  = i === tourSteps.length - 1 ? 'Explore Performance →' : 'Next →';
+  document.getElementById('tt-next').textContent  = i === tourSteps.length - 1 ? 'Done ✓' : 'Next →';
 
   const dots = document.getElementById('tt-dots');
   dots.innerHTML = tourSteps.map((_, j) =>
@@ -1206,7 +1205,18 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === 'Enter') nextTourStep();
 });
 </script>
-<!-- Tour Prompt Modal -->
+<!-- Performance Prompt Modal -->
+<div id="perf-prompt" style="display:none;position:fixed;inset:0;background:rgba(5,8,16,0.85);z-index:300;align-items:center;justify-content:center;">
+  <div style="background:linear-gradient(145deg,#122440,#0a1526);border:1px solid rgba(240,184,64,0.28);border-radius:20px;padding:40px;max-width:420px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.7);">
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#f0b840;margin-bottom:16px;">You're all caught up</div>
+    <div style="font-size:28px;font-weight:900;letter-spacing:-1px;color:#f8faff;margin-bottom:12px;">Want to see who's leading?</div>
+    <div style="font-size:14px;color:#8ea4c8;line-height:1.65;margin-bottom:32px;">The Performance page shows policies issued, contact rates, and your full agent leaderboard for the month.</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button onclick="document.getElementById('perf-prompt').style.display='none';showPage('performance');" style="background:linear-gradient(135deg,#ffe080,#f0b840,#cc8e1a);color:#02040a;border:none;border-radius:12px;padding:14px 28px;font-size:14px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;">Explore Performance →</button>
+      <button onclick="document.getElementById('perf-prompt').style.display='none';" style="background:transparent;color:#5a72a0;border:none;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;padding:8px;">Stay on Dashboard</button>
+    </div>
+  </div>
+</div>
 <div id="tour-prompt" style="position:fixed;inset:0;background:rgba(5,8,16,0.85);z-index:300;display:flex;align-items:center;justify-content:center;">
   <div style="background:linear-gradient(145deg,#122440,#0a1526);border:1px solid rgba(240,184,64,0.28);border-radius:20px;padding:40px;max-width:420px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.7);">
     <div style="font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#f0b840;margin-bottom:16px;">Welcome to the Owner Hub</div>
