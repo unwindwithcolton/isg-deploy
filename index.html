@@ -789,6 +789,10 @@ html, body {
       </div>
 
       <!-- BOTTOM NAV -->
+      <div style="text-align:center;padding:6px 0 2px;flex-shrink:0;">
+        <span style="font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);opacity:0.7;animation:try-hint 2.5s ease-in-out infinite;">↓ tap to explore</span>
+      </div>
+      <style>@keyframes try-hint{0%,100%{opacity:0.4}50%{opacity:1}}</style>
       <div class="bottom-nav">
         <div class="nav-item" onclick="switchTab('pulse')"><div class="nav-icon-wrap active" id="nav-pulse"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></div><div class="nav-label active" id="nl-pulse">Pulse</div></div>
         <div class="nav-item" onclick="switchTab('leads')"><div class="nav-icon-wrap" id="nav-leads"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="nav-label" id="nl-leads">Leads</div></div>
