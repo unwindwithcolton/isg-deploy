@@ -1104,6 +1104,7 @@ function runStep(i) {
   // 1. Unlock everything — .main AND .layout (which has overflow:hidden in CSS)
   m.style.overflow      = 'auto';
   layout.style.overflow = 'visible';
+  layout.style.height   = 'auto';
   document.body.style.overflow = '';
   window.removeEventListener('wheel',     preventDefault);
   window.removeEventListener('touchmove', preventDefault);
