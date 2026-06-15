@@ -538,7 +538,7 @@ body {
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       Take the Tour
     </button>
-    <div class="nav-icon-btn">
+    <div class="nav-icon-btn" aria-label="Notifications">
       <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <div class="notif-dot"></div>
     </div>
@@ -879,7 +879,6 @@ body {
         <div class="back-page-title">Team Performance</div>
       </div>
       <div class="perf-grid">
-        <!-- Policies Issued by Agent -->
         <div class="perf-card">
           <div class="perf-title">Policies Issued · June MTD</div>
           <div class="perf-sub">Goal: 20 total across all agents</div>
@@ -892,8 +891,6 @@ body {
             <div class="bar-row"><div class="bar-label">Others (5)</div><div class="bar-track"><div class="bar-fill gold" style="width:25%;">2</div></div><div class="bar-val">2</div></div>
           </div>
         </div>
-
-        <!-- Contact Rate -->
         <div class="perf-card">
           <div class="perf-title">Contact Rate by Agent</div>
           <div class="perf-sub">% of leads with at least one connection</div>
@@ -905,8 +902,6 @@ body {
             <div class="bar-row"><div class="bar-label">Williams</div><div class="bar-track"><div class="bar-fill blue" style="width:48%;">24%</div></div><div class="bar-val">24%</div></div>
           </div>
         </div>
-
-        <!-- Leaderboard -->
         <div class="perf-card full">
           <div class="perf-title">Agent Leaderboard · June</div>
           <div class="perf-sub">Ranked by policies issued · Commission shown</div>
@@ -971,7 +966,6 @@ body {
 
 <!-- ══ TOUR OVERLAY ══ -->
 <div class="tour-overlay" id="tour-overlay">
-  <!-- SVG backdrop with a transparent hole punched out over the target -->
   <svg class="tour-svg-backdrop" id="tour-svg">
     <defs>
       <mask id="tour-mask">
@@ -1035,55 +1029,59 @@ const tourSteps = [
   }
 ];
 
+// How long to wait for smooth scroll to settle before relocking and placing elements.
+// Match or slightly exceed your longest CSS smooth-scroll duration.
+const SCROLL_SETTLE_MS = 650;
+
 let currentStep = 0;
 const mainEl = () => document.querySelector('.main');
 
 function preventDefault(e) { e.preventDefault(); e.stopPropagation(); }
 
-function lockScroll() {
-  const m = mainEl();
-  // Lock the scrollable main panel
-  m.style.overflow = 'hidden';
-  // Lock the document body too in case of any overflow
-  document.body.style.overflow = 'hidden';
-  // Block all scroll events everywhere
+function blockScrollKeys(e) {
+  // Block page-scroll keys; allow Enter for tour advancement
+  const scrollKeys = [32, 33, 34, 35, 36, 38, 40]; // space, pgup, pgdn, home, end, up, down
+  if (scrollKeys.includes(e.keyCode)) e.preventDefault();
+}
+
+/*
+ * KEY INSIGHT: We never set overflow:hidden on .main itself.
+ * Doing so freezes scrollTop and makes programmatic scrollTo() a no-op.
+ * Instead we block user-scroll via wheel/touch/key event listeners only,
+ * while leaving .main's overflow as 'auto' so we can still drive it programmatically.
+ */
+function lockUserScroll() {
+  document.body.style.overflow = 'hidden'; // prevent body scroll bleed
   window.addEventListener('wheel',     preventDefault, { passive: false });
   window.addEventListener('touchmove', preventDefault, { passive: false });
   document.addEventListener('keydown',  blockScrollKeys, false);
 }
 
-function unlockScroll() {
-  const m = mainEl();
-  m.style.overflow = '';
+function unlockUserScroll() {
   document.body.style.overflow = '';
   window.removeEventListener('wheel',     preventDefault);
   window.removeEventListener('touchmove', preventDefault);
   document.removeEventListener('keydown',  blockScrollKeys);
 }
 
-function blockScrollKeys(e) {
-  // Block arrow keys, space, page up/down, home/end while tour is active
-  const scrollKeys = [32, 33, 34, 35, 36, 37, 38, 39, 40];
-  // But still allow Enter and right arrow for tour navigation
-  if (e.keyCode === 13 || e.keyCode === 39) return; // Enter, right arrow
-  if (scrollKeys.includes(e.keyCode)) { e.preventDefault(); }
-}
-
 function startTour() {
   currentStep = 0;
+  unlockUserScroll(); // clear any stale lock first
   document.getElementById('tour-overlay').classList.add('active');
-  // Make sure scroll is UNlocked before we try to scroll anywhere
-  unlockScroll();
-  // Snap to top instantly for step 1, then lock and place
+  // Snap to top instantly before step 1
   mainEl().scrollTo({ top: 0, behavior: 'instant' });
-  setTimeout(() => {
-    lockScroll();
-    placeElements(0);
-  }, 60);
+  // Brief delay to let the instant scroll commit, then lock and place
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      lockUserScroll();
+      placeElements(0);
+    });
+  });
 }
 
 function endTour() {
-  unlockScroll();
+  unlockUserScroll();
+  currentStep = 0;
   document.getElementById('tour-overlay').classList.remove('active');
 }
 
@@ -1098,35 +1096,36 @@ function nextTourStep() {
 }
 
 function runStep(i) {
-  const m = mainEl();
+  const m      = mainEl();
+  const target = document.getElementById(tourSteps[i].target);
 
-  // Temporarily enable scrolling on main only
-  m.style.overflow = 'auto';
-  window.removeEventListener('wheel',     preventDefault);
-  window.removeEventListener('touchmove', preventDefault);
-  document.removeEventListener('keydown',  blockScrollKeys);
+  // Step 1: Release user-scroll lock so our scrollTo() isn't fighting event prevention.
+  // We keep body overflow:hidden to prevent any outer scroll bleed.
+  // Crucially, we do NOT touch m.style.overflow — it stays 'auto'.
+  unlockUserScroll();
+  document.body.style.overflow = 'hidden'; // keep body locked throughout
 
-  const flagsEl  = document.getElementById('tour-flags');
-  const mainRect = m.getBoundingClientRect();
-  const flagsRect = flagsEl.getBoundingClientRect();
+  // Step 2: Calculate how far to scroll to bring the target into view
+  const mainRect   = m.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  // Current scroll position + target's distance from top of visible area - 80px breathing room
+  const desiredScroll = Math.max(0, m.scrollTop + (targetRect.top - mainRect.top) - 80);
 
-  let desiredScroll;
-  if (i === tourSteps.length - 1) {
-    desiredScroll = m.scrollTop + flagsRect.top - mainRect.top - 80;
-  } else {
-    const target = document.getElementById(tourSteps[i].target);
-    const targetRect = target.getBoundingClientRect();
-    desiredScroll = Math.max(0, m.scrollTop + targetRect.top - mainRect.top - 90);
-  }
-
+  // Step 3: Smooth scroll to target
   m.scrollTo({ top: desiredScroll, behavior: 'smooth' });
 
+  // Step 4: After scroll settles, relock user input and position tour UI
   setTimeout(() => {
-    lockScroll();
+    lockUserScroll();
     placeElements(i);
-  }, 650);
+  }, SCROLL_SETTLE_MS);
 }
 
+/*
+ * placeElements: positions the SVG cutout, gold highlight ring, and tooltip
+ * over the target element. Must be top-level so both startTour() and runStep()
+ * can call it (fixes the original scope bug where it was nested inside runStep).
+ */
 function placeElements(i) {
   const step   = tourSteps[i];
   const target = document.getElementById(step.target);
@@ -1140,45 +1139,22 @@ function placeElements(i) {
   const hw = rect.width  + pad * 2;
   const hh = rect.height + pad * 2;
 
-  // SVG hole — transparent window punched through the dark mask
+  // Punch transparent hole through the SVG backdrop mask
   const hole = document.getElementById('tour-hole');
   hole.setAttribute('x',      hx);
   hole.setAttribute('y',      hy);
   hole.setAttribute('width',  hw);
   hole.setAttribute('height', hh);
 
-  // Gold ring
+  // Gold highlight ring
   const hl = document.getElementById('tour-highlight');
   hl.style.left   = hx + 'px';
   hl.style.top    = hy + 'px';
   hl.style.width  = hw + 'px';
   hl.style.height = hh + 'px';
 
-  // Tooltip placement
-  const ttW = 300, ttH = 220, margin = 18;
-  let left, top;
-
-  if (step.placement === 'below') {
-    left = hx + hw / 2 - ttW / 2;
-    top  = hy + hh + margin;
-  } else if (step.placement === 'above') {
-    left = hx + hw / 2 - ttW / 2;
-    top  = hy - ttH - margin;
-  } else if (step.placement === 'left') {
-    left = hx - ttW - margin;
-    top  = hy + hh / 2 - ttH / 2;
-  } else {
-    left = hx + hw + margin;
-    top  = hy + hh / 2 - ttH / 2;
-  }
-
-  left = Math.max(margin, Math.min(left, vw - ttW - margin));
-  top  = Math.max(margin, Math.min(top,  vh - ttH - margin));
-
+  // Populate tooltip content first so we can measure its real rendered height
   const tt = document.getElementById('tour-tooltip');
-  tt.style.left = left + 'px';
-  tt.style.top  = top  + 'px';
-
   document.getElementById('tt-step').textContent  = `Step ${i + 1} of ${tourSteps.length}`;
   document.getElementById('tt-title').textContent = step.title;
   document.getElementById('tt-body').textContent  = step.body;
@@ -1188,14 +1164,43 @@ function placeElements(i) {
   dots.innerHTML = tourSteps.map((_, j) =>
     `<div class="tt-dot${j === i ? ' active' : ''}"></div>`
   ).join('');
+
+  // Measure actual tooltip height after content is set (fixes hardcoded 220px bug)
+  const ttW    = 300;
+  const ttH    = tt.getBoundingClientRect().height || 220;
+  const margin = 18;
+
+  let left, top;
+  if (step.placement === 'below') {
+    left = hx + hw / 2 - ttW / 2;
+    top  = hy + hh + margin;
+  } else if (step.placement === 'above') {
+    left = hx + hw / 2 - ttW / 2;
+    top  = hy - ttH - margin;
+  } else if (step.placement === 'left') {
+    left = hx - ttW - margin;
+    top  = hy + hh / 2 - ttH / 2;
+  } else { // right
+    left = hx + hw + margin;
+    top  = hy + hh / 2 - ttH / 2;
+  }
+
+  // Clamp tooltip to viewport edges
+  left = Math.max(margin, Math.min(left, vw - ttW - margin));
+  top  = Math.max(margin, Math.min(top,  vh - ttH - margin));
+
+  tt.style.left = left + 'px';
+  tt.style.top  = top  + 'px';
 }
 
+// Keyboard shortcuts for the tour
 document.addEventListener('keydown', e => {
   if (!document.getElementById('tour-overlay').classList.contains('active')) return;
-  if (e.key === 'Escape') endTour();
+  if (e.key === 'Escape')                         endTour();
   if (e.key === 'ArrowRight' || e.key === 'Enter') nextTourStep();
 });
 </script>
+
 <!-- Performance Prompt Modal -->
 <div id="perf-prompt" style="display:none;position:fixed;inset:0;background:rgba(5,8,16,0.85);z-index:300;align-items:center;justify-content:center;">
   <div style="background:linear-gradient(145deg,#122440,#0a1526);border:1px solid rgba(240,184,64,0.28);border-radius:20px;padding:40px;max-width:420px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.7);">
@@ -1208,6 +1213,8 @@ document.addEventListener('keydown', e => {
     </div>
   </div>
 </div>
+
+<!-- Welcome Prompt Modal -->
 <div id="tour-prompt" style="position:fixed;inset:0;background:rgba(5,8,16,0.85);z-index:300;display:flex;align-items:center;justify-content:center;">
   <div style="background:linear-gradient(145deg,#122440,#0a1526);border:1px solid rgba(240,184,64,0.28);border-radius:20px;padding:40px;max-width:420px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.7);">
     <div style="font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#f0b840;margin-bottom:16px;">Welcome to the Owner Hub</div>
@@ -1219,5 +1226,6 @@ document.addEventListener('keydown', e => {
     </div>
   </div>
 </div>
+
 </body>
 </html>
