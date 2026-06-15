@@ -450,7 +450,7 @@ body {
 
 .tour-svg-backdrop {
   position:fixed; inset:0; width:100%; height:100%;
-  pointer-events:all; cursor:default;
+  pointer-events:none; cursor:default;
 }
 
 .tour-highlight {
@@ -1022,10 +1022,10 @@ function goToStep(i) {
   const m      = mainEl();
   const target = document.getElementById(tourSteps[i].target);
 
-  // offsetTop is the element's absolute distance from the top of .main —
-  // it never changes based on scroll position, so this is always accurate.
-  // We subtract 40px to give breathing room above the highlighted area.
-  const targetScrollTop = target.offsetTop - 40;
+  // Distance from the top of .main's visible area to the top of the target,
+  // plus however far .main has already scrolled = absolute scroll position needed.
+  // Subtract 40px for breathing room above the highlight.
+  const targetScrollTop = m.scrollTop + target.getBoundingClientRect().top - m.getBoundingClientRect().top - 40;
 
   // Smooth scroll .main to that exact position
   m.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
