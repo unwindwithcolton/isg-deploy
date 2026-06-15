@@ -1050,19 +1050,8 @@ function blockScrollKeys(e) {
  * Instead we block user-scroll via wheel/touch/key event listeners only,
  * while leaving .main's overflow as 'auto' so we can still drive it programmatically.
  */
-function lockUserScroll() {
-  document.body.style.overflow = 'hidden'; // prevent body scroll bleed
-  window.addEventListener('wheel',     preventDefault, { passive: false });
-  window.addEventListener('touchmove', preventDefault, { passive: false });
-  document.addEventListener('keydown',  blockScrollKeys, false);
-}
-
-function unlockUserScroll() {
-  document.body.style.overflow = '';
-  window.removeEventListener('wheel',     preventDefault);
-  window.removeEventListener('touchmove', preventDefault);
-  document.removeEventListener('keydown',  blockScrollKeys);
-}
+function lockUserScroll() {}
+function unlockUserScroll() {}
 
 function startTour() {
   currentStep = 0;
