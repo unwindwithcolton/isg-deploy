@@ -1099,26 +1099,25 @@ function runStep(i) {
   const m      = mainEl();
   const target = document.getElementById(tourSteps[i].target);
 
-  // Step 1: Release user-scroll lock so our scrollTo() isn't fighting event prevention.
-  // We keep body overflow:hidden to prevent any outer scroll bleed.
-  // Crucially, we do NOT touch m.style.overflow — it stays 'auto'.
+  // Fully unlock everything — wheel, touch, keys, body — so the browser
+  // can execute the programmatic scroll without any interference.
   unlockUserScroll();
-  document.body.style.overflow = 'hidden'; // keep body locked throughout
+  document.body.style.overflow = '';
 
-  // Step 2: Calculate how far to scroll to bring the target into view
+  // Directly set scrollTop (no smooth, no event dependency, always works).
+  // getBoundingClientRect gives position relative to viewport; we convert
+  // that to a scrollTop offset inside .main.
   const mainRect   = m.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
-  // Current scroll position + target's distance from top of visible area - 80px breathing room
-  const desiredScroll = Math.max(0, m.scrollTop + (targetRect.top - mainRect.top) - 80);
+  const newScrollTop = Math.max(0, m.scrollTop + (targetRect.top - mainRect.top) - 80);
+  m.scrollTop = newScrollTop;
 
-  // Step 3: Smooth scroll to target
-  m.scrollTo({ top: desiredScroll, behavior: 'smooth' });
-
-  // Step 4: After scroll settles, relock user input and position tour UI
-  setTimeout(() => {
+  // Re-lock after one frame (scroll is instant so no settle time needed),
+  // then place the highlight and tooltip over the now-visible element.
+  requestAnimationFrame(() => {
     lockUserScroll();
     placeElements(i);
-  }, SCROLL_SETTLE_MS);
+  });
 }
 
 /*
