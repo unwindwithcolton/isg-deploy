@@ -108,6 +108,8 @@ body {
   font-family:'Inter',sans-serif; cursor:pointer; transition:all 0.15s;
 }
 .tour-btn:hover { background:var(--gold-mid); }
+.get-info-btn { display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#ffe080,var(--gold),var(--gold-lo));color:var(--navy-900);border:none;border-radius:var(--r-chip);padding:9px 18px;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;animation:flash-btn 1.4s ease-in-out infinite;box-shadow:0 0 18px rgba(240,184,64,0.5); }
+@keyframes flash-btn { 0%,100%{box-shadow:0 0 18px rgba(240,184,64,0.5);opacity:1;} 50%{box-shadow:0 0 40px rgba(240,184,64,0.9);opacity:0.7;} }
 .tour-btn svg { width:14px; height:14px; stroke:var(--gold-hi); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 
 .layout { display:flex; flex:1; overflow:hidden; height:calc(100vh - 72px); }
@@ -504,6 +506,7 @@ body {
   </div>
   <div class="nav-right">
     <div class="nav-date">Sunday, June 14, 2026</div>
+    <button class="get-info-btn" onclick="document.getElementById('info-modal').style.display='flex'">✦ Get More Info</button>
     <button class="tour-btn" onclick="startTour()">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       Take the Tour
@@ -1113,6 +1116,83 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === 'Enter') nextTourStep();
 });
 </script>
+
+<!-- Get More Info Modal -->
+<div id="info-modal" style="display:none;position:fixed;inset:0;background:rgba(5,8,16,0.88);z-index:400;align-items:center;justify-content:center;">
+  <div style="background:linear-gradient(145deg,#122440,#0a1526);border:1px solid rgba(240,184,64,0.28);border-radius:20px;padding:44px;max-width:600px;width:90%;position:relative;box-shadow:0 8px 60px rgba(0,0,0,0.8);max-height:90vh;overflow-y:auto;">
+    <button onclick="document.getElementById('info-modal').style.display='none'" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;width:32px;height:32px;color:#8ea4c8;font-size:16px;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;">✕</button>
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#f0b840;margin-bottom:10px;">Built for ISG Financial</div>
+    <div style="font-size:28px;font-weight:900;letter-spacing:-1px;color:#f8faff;margin-bottom:6px;">What this costs.<br>What comes next.</div>
+    <div style="height:2px;width:48px;background:#f0b840;opacity:0.4;margin:18px 0 28px;"></div>
+
+    <!-- PRICING -->
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#f0b840;margin-bottom:14px;">Investment</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px;">
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(240,184,64,0.25);border-radius:14px;padding:20px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#8ea4c8;margin-bottom:6px;">One-Time Build Fee</div>
+        <div style="font-size:36px;font-weight:900;letter-spacing:-1.5px;color:#f0b840;line-height:1;">$7,500</div>
+        <div style="font-size:12px;color:#5a72a0;margin-top:6px;">50% to start · 50% on go-live</div>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:7px;">
+          <div style="font-size:12px;color:#ccd8f0;">✓ Agent PWA (The Pulse)</div>
+          <div style="font-size:12px;color:#ccd8f0;">✓ Manager Dashboard</div>
+          <div style="font-size:12px;color:#ccd8f0;">✓ GOAT Leads webhook intake</div>
+          <div style="font-size:12px;color:#ccd8f0;">✓ AI scoring + sequences</div>
+          <div style="font-size:12px;color:#ccd8f0;">✓ Compliance layer built in</div>
+          <div style="font-size:12px;color:#ccd8f0;">✓ All 10 agents onboarded</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);border-radius:14px;padding:20px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#8ea4c8;margin-bottom:6px;">Monthly Retainer</div>
+        <div style="font-size:36px;font-weight:900;letter-spacing:-1.5px;color:#f8faff;line-height:1;">$350<span style="font-size:16px;font-weight:500;color:#5a72a0;">/mo</span></div>
+        <div style="font-size:12px;color:#5a72a0;margin-top:6px;">Starts when system goes live</div>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:7px;">
+          <div style="font-size:12px;color:#ccd8f0;">✓ Hosting + infrastructure</div>
+          <div style="font-size:12px;color:#ccd8f0;">✓ Claude AI API usage</div>
+          <div style="font-size:12px;color:#ccd8f0;">✓ Bug fixes + maintenance</div>
+          <div style="font-size:12px;color:#ccd8f0;">✓ Priority support</div>
+          <div style="font-size:12px;color:#ccd8f0;">✓ Monthly performance review</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROADMAP -->
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#f0b840;margin-bottom:14px;">What's Coming Next</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 18px;display:flex;align-items:flex-start;gap:14px;">
+        <div style="font-size:10px;font-weight:800;color:#f0b840;background:rgba(240,184,64,0.12);border:1px solid rgba(240,184,64,0.25);border-radius:6px;padding:3px 8px;white-space:nowrap;margin-top:1px;">Phase 2</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#f8faff;margin-bottom:3px;">Built-in Dialer + Call Recording</div>
+          <div style="font-size:12px;color:#8ea4c8;line-height:1.55;">One-tap calling from inside the app. Every call logged automatically. Recordings stored per lead so you can coach from real conversations.</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 18px;display:flex;align-items:flex-start;gap:14px;">
+        <div style="font-size:10px;font-weight:800;color:#f0b840;background:rgba(240,184,64,0.12);border:1px solid rgba(240,184,64,0.25);border-radius:6px;padding:3px 8px;white-space:nowrap;margin-top:1px;">Phase 2</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#f8faff;margin-bottom:3px;">Multi-Vendor Lead Intake</div>
+          <div style="font-size:12px;color:#8ea4c8;line-height:1.55;">Add EverQuote, iLife, or your own website form as lead sources. Each vendor gets its own normalizer — nothing changes downstream.</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 18px;display:flex;align-items:flex-start;gap:14px;">
+        <div style="font-size:10px;font-weight:800;color:#a78bfa;background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.25);border-radius:6px;padding:3px 8px;white-space:nowrap;margin-top:1px;">Phase 3</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#f8faff;margin-bottom:3px;">AI Quote Assistant</div>
+          <div style="font-size:12px;color:#8ea4c8;line-height:1.55;">Agent describes the prospect, AI suggests the right product tier and talking points based on budget, age, and lead type. Agents approve before anything is shared.</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 18px;display:flex;align-items:flex-start;gap:14px;">
+        <div style="font-size:10px;font-weight:800;color:#a78bfa;background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.25);border-radius:6px;padding:3px 8px;white-space:nowrap;margin-top:1px;">Phase 3</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#f8faff;margin-bottom:3px;">Agent Performance Coaching</div>
+          <div style="font-size:12px;color:#8ea4c8;line-height:1.55;">Weekly AI-generated coaching report per agent. Based on actual call outcomes, sequence response rates, and pipeline movement — not gut feel.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:#5a72a0;line-height:1.65;padding:16px;background:rgba(255,255,255,0.03);border-radius:10px;border:1px solid rgba(255,255,255,0.06);">
+      💡 <strong style="color:#8ea4c8;">You're already paying for leads.</strong> This system makes sure none of them fall through the cracks. Final payment is tied to the system working on real GOAT leads — not a closed policy.
+    </div>
+  </div>
+</div>
 
 <!-- Performance Prompt Modal -->
 <div id="perf-prompt" style="display:none;position:fixed;inset:0;background:rgba(5,8,16,0.85);z-index:300;align-items:center;justify-content:center;">
