@@ -110,6 +110,7 @@ body {
 .tour-btn:hover { background:var(--gold-mid); }
 .get-info-btn { display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#ffe080,var(--gold),var(--gold-lo));color:var(--navy-900);border:none;border-radius:var(--r-chip);padding:9px 18px;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;animation:flash-btn 1.4s ease-in-out infinite;box-shadow:0 0 18px rgba(240,184,64,0.5); }
 @keyframes flash-btn { 0%,100%{box-shadow:0 0 18px rgba(240,184,64,0.5);opacity:1;} 50%{box-shadow:0 0 40px rgba(240,184,64,0.9);opacity:0.7;} }
+@keyframes training-glow { 0%,100%{box-shadow:0 0 24px rgba(240,184,64,0.12),0 2px 8px rgba(0,0,0,0.4),inset 0 1px 0 rgba(240,184,64,0.15);border-color:rgba(240,184,64,0.40);} 50%{box-shadow:0 0 32px rgba(240,184,64,0.22),0 2px 8px rgba(0,0,0,0.4),inset 0 1px 0 rgba(240,184,64,0.25);border-color:rgba(240,184,64,0.65);} }
 .tour-btn svg { width:14px; height:14px; stroke:var(--gold-hi); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 
 .layout { display:flex; flex:1; overflow:hidden; height:calc(100vh - 72px); }
@@ -1154,7 +1155,7 @@ document.addEventListener('keydown', e => {
             <div style="font-size:12px;color:#ccd8f0;margin-bottom:6px;">✓ Ongoing updates and new features</div>
             <div style="font-size:12px;color:#ccd8f0;margin-bottom:6px;">✓ Same-day support if anything breaks</div>
             <div style="font-size:12px;color:#ccd8f0;margin-bottom:10px;">✓ Direct line to your developer, always</div>
-            <div <div style="font-size:11px;color:#f0b840;font-weight:600;line-height:1.6;background:rgba(240,184,64,0.10);border:1px solid rgba(240,184,64,0.35);border-radius:8px;padding:10px 12px;animation:flash-btn 1.4s ease-in-out infinite;">Includes hands-on training until you and your team can run and update the system completely on your own.</div>
+            <div <div style="font-size:11px;color:#f8faff;font-weight:600;line-height:1.6;background:linear-gradient(135deg,rgba(240,184,64,0.18),rgba(240,184,64,0.08));border:1px solid rgba(240,184,64,0.40);border-radius:8px;padding:12px 14px;box-shadow:0 0 24px rgba(240,184,64,0.12),0 2px 8px rgba(0,0,0,0.4),inset 0 1px 0 rgba(240,184,64,0.15);animation:training-glow 3.5s ease-in-out infinite;">Includes hands-on training until you and your team can run and update the system completely on your own.</div>
           </div>
         
         </div>
